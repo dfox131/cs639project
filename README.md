@@ -1,5 +1,6 @@
 # cs639project
-Team project for CS 639 Mobile App Development (Fall 2025)
+Team project for CS 639 Mobile App Development (Fall 2025).  
+This project focuses on designing and developing an Android application using Kotlin, Jetpack Compose, and Android Studio.
 
 ## Idea Proposal & Research
 You can read our full Idea Proposal & Research document here:  
@@ -23,6 +24,6 @@ The full interactive design can be viewed in Figma here:
 
 ## Team
 
-- [Daniel](https://github.com/dfox131/cs639)
-- [Siming](https://github.com/leolub/cs639)
-- [Sarvesh](https://github.com/sarvesh-shah/CS-639)
+- [Daniel](https://github.com/dfox131)
+- [Siming](https://github.com/leolub)
+- [Sarvesh](https://github.com/sarvesh-shah)
