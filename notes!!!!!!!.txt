@@ -1,0 +1,7 @@
+ExerciseSuggestion.kt: data model for exercise suggestions + a small list of mock data.
+
+ApiSuggestionsScreen.kt: UI for the API Suggestions page, shows the cards and “Try” button using the mock data.
+
+MainActivity.kt: temporarily set to open ApiSuggestionsScreen() on launch for testing.
+
+These can be adjusted or removed after the project is completed and are mainly for collaboration reference.
