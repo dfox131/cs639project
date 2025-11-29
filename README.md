@@ -21,6 +21,7 @@ You can view our complete database schema here:
 - [Material Design 3](https://m3.material.io/)
 - [Firebase Authentication](https://firebase.google.com/products/auth)
 - [Firebase Firestore](https://firebase.google.com/products/firestore)
+- [Google Fit API (Fitness API)](https://developers.google.com/fit)
 - [Wger Workout API](https://wger.de/en/software/api)  
   *(or)*  
   [API Ninjas Exercise API](https://api-ninjas.com/api/exercises)
