@@ -10,6 +10,10 @@ You can read our full Idea Proposal & Research document here:
 The full interactive design can be viewed in Figma here:  
 [**Figma Prototype – Fitness Habit Builder**](https://www.figma.com/design/dFV5TPc9RhQ5yhaU15LsYM/Fitness-Habit-Builder?node-id=0-1&t=cxMXaUuI5Hl8b9gv-1)
 
+## Database Design
+You can view our complete database schema here:  
+[**Database Design Document**](https://paceuniversity-my.sharepoint.com/:w:/g/personal/df99571n_pace_edu/Eb3hxrGZX8RBvERSvCNKvDIBEmcfWy6QTzHx773rLmYZsQ?e=HKmith)
+
 ## Technologies & APIs
 
 - [Kotlin](https://kotlinlang.org/)
