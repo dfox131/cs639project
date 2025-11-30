@@ -26,7 +26,7 @@ You can view our complete database schema here:
   *(or)*  
   [API Ninjas Exercise API](https://api-ninjas.com/api/exercises)
 - [Android Notifications API](https://developer.android.com/develop/ui/views/notifications)
-
+- [Android Google Health Connect](https://developer.android.com/health-and-fitness/health-connect)
 ## Team
 
 - [Daniel](https://github.com/dfox131)
