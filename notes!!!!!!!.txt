@@ -4,7 +4,7 @@ ApiSuggestionsScreen.kt: UI for the API Suggestions page, shows the cards and â€
 
 SettingsScreen.kt: UI for the Settings page; includes daily reminder switch, notification time selector using the system TimePickerDialog, clickable Edit on Profile , and a theme switch that toggles a simple light/dark appearance. All state is local only.
 
-MainActivity.kt: temporarily set to open different pages on launch for testing.
+MainActivity.kt: temporarily set to open different pages on launch for testing. Also adjusted some references for streak screen as of now.
 
 These can be adjusted or removed after the project is completed and are mainly for collaboration reference.
 
