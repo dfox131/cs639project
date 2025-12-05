@@ -17,7 +17,8 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             MaterialTheme {
-                FirestoreTestScreen()
+                MomentumApp()
+                //FirestoreTestScreen()
                 // SettingsScreen()      // test screen -Siming
                 // ApiSuggestionsScreen() // test screen -Siming
             }
@@ -25,37 +26,37 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-@Composable
-fun DailyHubScreen(
-    habits: List<Habit>
-) {
-    Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("Daily Hub") })
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { /* Navigate to Rewards Screen */ },
-                content = { Icon(Icons.Filled.Trophy, contentDescription = "Rewards") }
-            )
-        },
-        modifier = Modifier.fillMaxSize()
-    ) { paddingValues ->
-
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            item {
-                Text(text = " 2 Days Streak", modifier = Modifier.padding(16.dp))
-            }
-
-            items(habits) { habit ->
-                HabitCompletionCard(habit = habit)
-            }
-        }
-    }
-}
+//@Composable
+//fun DailyHubScreen(
+//    habits: List<Habit>
+//) {
+//    Scaffold(
+//        topBar = {
+//            TopAppBar(title = { Text("Daily Hub") })
+//        },
+//        floatingActionButton = {
+//            FloatingActionButton(
+//                onClick = { /* Navigate to Rewards Screen */ },
+//                content = { Icon(Icons.Filled.Trophy, contentDescription = "Rewards") }
+//            )
+//        },
+//        modifier = Modifier.fillMaxSize()
+//    ) { paddingValues ->
+//
+//        LazyColumn(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(paddingValues)
+//                .padding(horizontal = 16.dp),
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            item {
+//                Text(text = " 2 Days Streak", modifier = Modifier.padding(16.dp))
+//            }
+//
+//            items(habits) { habit ->
+//                HabitCompletionCard(habit = habit)
+//            }
+//        }
+//    }
+//}
