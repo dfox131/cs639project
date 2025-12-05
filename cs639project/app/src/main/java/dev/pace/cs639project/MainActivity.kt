@@ -26,17 +26,36 @@ class MainActivity : ComponentActivity() {
     }
 }
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun DailyHubScreen(
+    habits: List<Habit>
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text("Daily Hub") })
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { /* Navigate to Rewards Screen */ },
+                content = { Icon(Icons.Filled.Trophy, contentDescription = "Rewards") }
+            )
+        },
+        modifier = Modifier.fillMaxSize()
+    ) { paddingValues ->
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Cs639projectTheme {
-        Greeting("Android")
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            item {
+                Text(text = " 2 Days Streak", modifier = Modifier.padding(16.dp))
+            }
+
+            items(habits) { habit ->
+                HabitCompletionCard(habit = habit)
+            }
+        }
     }
 }
