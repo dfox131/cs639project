@@ -3,17 +3,13 @@ package dev.pace.cs639project
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import dev.pace.cs639project.ui.theme.Cs639projectTheme
-import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
+import dev.pace.cs639project.screens.FirestoreTestScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,8 +17,11 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             MaterialTheme {
-                SettingsScreen()
+                FirestoreTestScreen()
+                // SettingsScreen()      // test screen -Siming
+                // ApiSuggestionsScreen() // test screen -Siming
             }
+
         }
     }
 }
