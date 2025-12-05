@@ -23,13 +23,16 @@ class FirestoreViewModel(
         viewModelScope.launch {
             val result = repo.getUserHabits(userId)
 
-            result.onSuccess { listOfMaps ->
-                _habits.value = listOfMaps.mapNotNull { map ->
-                    Habit.fromMap(map)    // convert Map → Habit object
+            result
+                .onSuccess { habits ->
+                    _habits.value = habits
                 }
-            }
+                .onFailure { e ->
+                    e.printStackTrace()
+                }
         }
     }
+
 
     // ----------------------------
     // ADD HABIT

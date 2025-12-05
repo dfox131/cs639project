@@ -63,7 +63,10 @@ class FirestoreRepository {
         reminderTime: String?
     ): Result<String> {
         return try {
+            val docRef = db.collection("habits").document() // create ID first
+
             val habit = hashMapOf(
+                "habitId" to docRef.id,
                 "userId" to userId,
                 "name" to name,
                 "type" to type,
@@ -73,7 +76,7 @@ class FirestoreRepository {
                 "updatedAt" to Timestamp.now()
             )
 
-            val docRef = db.collection("habits").add(habit).await()
+            docRef.set(habit).await()
             Result.success(docRef.id)
 
         } catch (e: Exception) {
@@ -81,20 +84,34 @@ class FirestoreRepository {
         }
     }
 
-    suspend fun getUserHabits(userId: String): Result<List<Map<String, Any>>> {
+
+    suspend fun getUserHabits(userId: String): Result<List<Habit>> {
         return try {
             val snapshot = db.collection("habits")
                 .whereEqualTo("userId", userId)
                 .get()
                 .await()
 
-            val habits = snapshot.documents.mapNotNull { it.data }
-            Result.success(habits)
+            val habits = snapshot.documents.mapNotNull { doc ->
+                val data = doc.data
+                if (data != null) {
+                    Habit(
+                        habitId = doc.id,
+                        userId = data["userId"] as? String ?: "",
+                        name = data["name"] as? String ?: "",
+                        type = data["type"] as? String ?: "",
+                        goal = (data["goal"] as? Number)?.toInt(),
+                        reminderTime = data["reminderTime"] as? String
+                    )
+                } else null
+            }
 
+            Result.success(habits)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
+
 
     // --------------------------
     // PROGRESS (Daily completion)

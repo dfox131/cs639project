@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import dev.pace.cs639project.ui.theme.Cs639projectTheme
 import androidx.compose.material3.MaterialTheme
+import dev.pace.cs639project.screens.AddHabitScreen
 import dev.pace.cs639project.screens.FirestoreTestScreen
 
 class MainActivity : ComponentActivity() {
@@ -17,8 +18,9 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             MaterialTheme {
-                MomentumApp()
-                //FirestoreTestScreen()
+                AddHabitScreen()
+                // MomentumApp()
+                // FirestoreTestScreen()
                 // SettingsScreen()      // test screen -Siming
                 // ApiSuggestionsScreen() // test screen -Siming
             }
