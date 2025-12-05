@@ -10,9 +10,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import dev.pace.cs639project.ui.theme.Cs639projectTheme
 import androidx.compose.material3.MaterialTheme
 import dev.pace.cs639project.screens.FirestoreTestScreen
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material.icons.filled.Trophy
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
