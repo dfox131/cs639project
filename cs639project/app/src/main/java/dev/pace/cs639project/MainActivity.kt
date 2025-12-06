@@ -20,7 +20,6 @@ class MainActivity : ComponentActivity() {
             MaterialTheme {
                 MomentumApp()
 
-                // Commented-out test screens below for clarity
                 // AddHabitScreen()
                 // FirestoreTestScreen()
                 // SettingsScreen()      // test screen -Siming

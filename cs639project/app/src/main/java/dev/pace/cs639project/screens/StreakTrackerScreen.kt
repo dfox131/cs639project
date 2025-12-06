@@ -1,7 +1,7 @@
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StreakTrackerScreen(
-    onNavigateBack: () -> Unit // Add a callback for the back button
+    onNavigateBack: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -17,13 +17,12 @@ fun StreakTrackerScreen(
                     // Back button to return to the HomeScreen
                     IconButton(onClick = onNavigateBack) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack, // Use standard back arrow
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Go Back"
                         )
                     }
                 },
                 actions = {
-                    // Retain the notification icon for consistency
                     IconButton(onClick = { /* Handle notification click */ }) {
                         Icon(
                             imageVector = Icons.Default.Notifications,
@@ -37,9 +36,9 @@ fun StreakTrackerScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding) // Apply padding from the Scaffold
+                .padding(innerPadding)
                 .padding(horizontal = 16.dp)
-                .background(Color(0xFFF5F7FB)), // Use the same background color as HomeScreen
+                .background(Color(0xFFF5F7FB)), 
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
