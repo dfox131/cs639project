@@ -1,4 +1,4 @@
-# cs639project
+# cs639project - Fitness Habit Builder
 Team project for CS 639 Mobile App Development (Fall 2025).  
 This project focuses on designing and developing an Android application using Kotlin, Jetpack Compose, and Android Studio.
 
