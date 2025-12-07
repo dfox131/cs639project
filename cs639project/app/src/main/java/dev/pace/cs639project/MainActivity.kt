@@ -18,9 +18,9 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             MaterialTheme {
-                MomentumApp()
 
-                // AddHabitScreen()
+                 AddHabitScreen()
+                 // MomentumApp()
                 // FirestoreTestScreen()
                 // SettingsScreen()      // test screen -Siming
                 // ApiSuggestionsScreen() // test screen -Siming

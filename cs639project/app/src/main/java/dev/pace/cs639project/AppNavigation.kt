@@ -90,14 +90,14 @@ fun MomentumApp() {
         when (currentScreen) {
             is AppScreen.Home -> HomeScreen(
                 onOpenDrawer = { scope.launch { drawerState.open() } },
-                onOpenStreakTracker = { currentScreen = AppScreen.StreakTracker },
+                // onOpenStreakTracker = { currentScreen = AppScreen.StreakTracker },
                 onOpenApi = { currentScreen = AppScreen.ApiSuggestions },
                 onOpenSettings = { currentScreen = AppScreen.Settings }
             )
 
-            is AppScreen.StreakTracker -> StreakTrackerScreen(
-                onNavigateBack = { currentScreen = AppScreen.Home }
-            )
+//            is AppScreen.StreakTracker -> StreakTrackerScreen(
+//                onNavigateBack = { currentScreen = AppScreen.Home }
+//            )
 
             is AppScreen.ApiSuggestions -> ApiSuggestionsScreen(
                 onBack = { currentScreen = AppScreen.Home }
@@ -106,6 +106,11 @@ fun MomentumApp() {
             is AppScreen.Settings -> SettingsScreen(
                 onBack = { currentScreen = AppScreen.Home }
             )
+
+            else -> {
+                // Temporarily ignore unhandled screens (like StreakTracker)
+            }
+
         }
     }
 }
