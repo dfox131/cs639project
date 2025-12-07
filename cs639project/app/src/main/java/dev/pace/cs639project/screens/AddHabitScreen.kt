@@ -1,5 +1,7 @@
 package dev.pace.cs639project.screens
 
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.layout.*
@@ -7,17 +9,21 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.pace.cs639project.data.Habit
 import dev.pace.cs639project.viewmodel.FirestoreViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddHabitScreen(
-    userId: String = "TEST_USER_123",              // TODO: replace with Firebase Auth UID later
     viewModel: FirestoreViewModel = viewModel(),
     onHabitSaved: () -> Unit = {}                  // callback for navigation later if we want
 ) {
+    val realUserId by viewModel.userId.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.initAuth()
+    }
+
     var name by remember { mutableStateOf("") }
     var type by remember { mutableStateOf("custom") }
     var goalText by remember { mutableStateOf("") }
@@ -122,8 +128,14 @@ fun AddHabitScreen(
                 val goal = goalText.toIntOrNull()
                 val reminder = reminderTime.ifBlank { null }
 
+                if (realUserId == null) {
+                    errorMessage = "User not authenticated yet. Please wait..."
+                    isSaving = false
+                    return@Button
+                }
+
                 val habit = Habit(
-                    userId = userId,
+                    userId = realUserId!!,
                     name = name.trim(),
                     type = type.ifBlank { "custom" }.trim(),
                     goal = goal,
@@ -131,7 +143,7 @@ fun AddHabitScreen(
                 )
 
                 viewModel.addHabit(
-                    userId = userId,
+                    userId = realUserId!!,
                     habit = habit,
                     onDone = {
                         isSaving = false

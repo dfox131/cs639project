@@ -2,9 +2,11 @@ package dev.pace.cs639project.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dev.pace.cs639project.data.AuthRepository
 import dev.pace.cs639project.data.FirestoreRepository
 import dev.pace.cs639project.data.Habit
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -12,7 +14,44 @@ class FirestoreViewModel(
     private val repo: FirestoreRepository = FirestoreRepository()
 ) : ViewModel() {
 
-    // STATE: list of habits
+    private val authRepo = AuthRepository()
+
+    // ----------------------------
+    // AUTH STATE
+    // ----------------------------
+    private val _userId = MutableStateFlow<String?>(null)
+    val userId: StateFlow<String?> = _userId.asStateFlow()
+
+    init {
+        initAuth()
+    }
+
+    fun initAuth() {
+        viewModelScope.launch {
+            println("AUTH STARTED")
+
+            val current = authRepo.getCurrentUserId()
+
+            if (current != null) {
+                _userId.value = current
+            } else {
+                val result = authRepo.signInAnonymously()
+
+                result.onSuccess { uid ->
+                    println("AUTH SUCCESS: $uid")
+                    _userId.value = uid
+                }
+
+                result.onFailure {
+                    it.printStackTrace()
+                }
+            }
+        }
+    }
+
+    // ----------------------------
+    // HABIT STATE
+    // ----------------------------
     private val _habits = MutableStateFlow<List<Habit>>(emptyList())
     val habits = _habits.asStateFlow()
 
@@ -33,7 +72,6 @@ class FirestoreViewModel(
         }
     }
 
-
     // ----------------------------
     // ADD HABIT
     // ----------------------------
@@ -53,7 +91,7 @@ class FirestoreViewModel(
 
             result.onSuccess {
                 onDone()
-                loadHabits(userId)      // refresh list
+                loadHabits(userId)
             }
         }
     }
