@@ -11,6 +11,7 @@ import dev.pace.cs639project.ui.theme.Cs639projectTheme
 import androidx.compose.material3.MaterialTheme
 import dev.pace.cs639project.screens.AddHabitScreen
 import dev.pace.cs639project.screens.FirestoreTestScreen
+import dev.pace.cs639project.screens.HabitListScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,7 +20,8 @@ class MainActivity : ComponentActivity() {
 
             MaterialTheme {
 
-                 AddHabitScreen()
+                //HabitListScreen()
+                    AddHabitScreen()
                  // MomentumApp()
                 // FirestoreTestScreen()
                 // SettingsScreen()      // test screen -Siming
