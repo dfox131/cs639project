@@ -21,10 +21,10 @@ class MainActivity : ComponentActivity() {
             MaterialTheme {
 
                 //HabitListScreen()
-                    AddHabitScreen()
-                 // MomentumApp()
+                   //AddHabitScreen()
+                  MomentumApp()
                 // FirestoreTestScreen()
-                // SettingsScreen()      // test screen -Siming
+                 //SettingsScreen()      // test screen -Siming
                 // ApiSuggestionsScreen() // test screen -Siming
             }
 

@@ -13,7 +13,8 @@ import dev.pace.cs639project.data.Habit
 
 @Composable
 fun HabitListScreen(
-    viewModel: FirestoreViewModel = viewModel()
+    viewModel: FirestoreViewModel = viewModel(),
+    onAddHabit: () -> Unit
 ) {
     val habits by viewModel.habits.collectAsState()
     val userId by viewModel.userId.collectAsState()

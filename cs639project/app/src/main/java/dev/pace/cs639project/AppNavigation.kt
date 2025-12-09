@@ -10,6 +10,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import dev.pace.cs639project.screens.AddHabitScreen
+import dev.pace.cs639project.screens.HabitListScreen
 import kotlinx.coroutines.launch
 
 
@@ -18,7 +20,11 @@ sealed class AppScreen {
     object StreakTracker : AppScreen()
     object ApiSuggestions : AppScreen()
     object Settings : AppScreen()
+
+    object Habits : AppScreen()
+    object AddEditHabit : AppScreen()
 }
+
 
 
 @Composable
@@ -84,6 +90,17 @@ fun MomentumApp() {
                     icon = { Icon(Icons.Default.Settings, contentDescription = null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
+
+                NavigationDrawerItem(
+                    label = { Text("My Habits") },
+                    selected = currentScreen is AppScreen.Habits,
+                    onClick = {
+                        currentScreen = AppScreen.Habits
+                        scope.launch { drawerState.close() }
+                    },
+                    icon = { Icon(Icons.Default.List, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
             }
         }
     ) {
@@ -98,6 +115,19 @@ fun MomentumApp() {
 //            is AppScreen.StreakTracker -> StreakTrackerScreen(
 //                onNavigateBack = { currentScreen = AppScreen.Home }
 //            )
+
+            is AppScreen.Habits -> HabitListScreen(
+                onAddHabit = {
+                    currentScreen = AppScreen.AddEditHabit
+                }
+            )
+
+
+            is AppScreen.AddEditHabit -> AddHabitScreen(
+                onHabitSaved = {
+                    currentScreen = AppScreen.Habits
+                }
+            )
 
             is AppScreen.ApiSuggestions -> ApiSuggestionsScreen(
                 onBack = { currentScreen = AppScreen.Home }
