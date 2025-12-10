@@ -13,12 +13,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.pace.cs639project.screens.AddHabitScreen
 import dev.pace.cs639project.screens.HabitListScreen
+import dev.pace.cs639project.screens.StreakTrackerScreen
+import dev.pace.cs639project.ApiSuggestionsScreen
+import dev.pace.cs639project.SettingsScreen
+import dev.pace.cs639project.HomeScreen
 import kotlinx.coroutines.launch
 
 
 sealed class AppScreen {
     object Home : AppScreen()
-    object StreakTracker : AppScreen()
+    data class StreakTracker(val habitId: String? = null) : AppScreen()
     object ApiSuggestions : AppScreen()
     object Settings : AppScreen()
 
@@ -27,13 +31,14 @@ sealed class AppScreen {
 }
 
 
-
 @Composable
 fun MomentumApp() {
     var currentScreen by remember { mutableStateOf<AppScreen>(AppScreen.Home) }
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
+    val defaultStreakHabitId = "DEFAULT_HABIT_ID_FOR_DRAWER"
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -61,14 +66,13 @@ fun MomentumApp() {
                     label = { Text("Streak Tracker") },
                     selected = currentScreen is AppScreen.StreakTracker,
                     onClick = {
-                        currentScreen = AppScreen.StreakTracker
+                        currentScreen = AppScreen.StreakTracker(habitId = defaultStreakHabitId)
                         scope.launch { drawerState.close() }
                     },
-                    icon = { Icon(Icons.Default.Star, contentDescription = null) }, // Using Star icon
+                    icon = { Icon(Icons.Default.Star, contentDescription = null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
 
-                // API Suggestions
                 NavigationDrawerItem(
                     label = { Text("API Suggestions") },
                     selected = currentScreen is AppScreen.ApiSuggestions,
@@ -80,7 +84,6 @@ fun MomentumApp() {
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
 
-                // Settings
                 NavigationDrawerItem(
                     label = { Text("Settings") },
                     selected = currentScreen is AppScreen.Settings,
@@ -120,18 +123,20 @@ fun MomentumApp() {
         when (currentScreen) {
             is AppScreen.Home -> HomeScreen(
                 onOpenDrawer = { scope.launch { drawerState.open() } },
-                // onOpenStreakTracker = { currentScreen = AppScreen.StreakTracker },
+                onOpenStreakTracker = { habitId -> currentScreen = AppScreen.StreakTracker(habitId = habitId) },
                 onOpenApi = { currentScreen = AppScreen.ApiSuggestions },
                 onOpenSettings = { currentScreen = AppScreen.Settings }
             )
 
-//            is AppScreen.StreakTracker -> StreakTrackerScreen(
-//                onNavigateBack = { currentScreen = AppScreen.Home }
-//            )
+            is AppScreen.StreakTracker -> StreakTrackerScreen(
+                habitId = (currentScreen as AppScreen.StreakTracker).habitId ?: defaultStreakHabitId,
+                onNavigateBack = { currentScreen = AppScreen.Home }
+            )
 
             is AppScreen.Habits -> HabitListScreen(
                 onBack = { currentScreen = AppScreen.Home },
-                onAddHabit = { currentScreen = AppScreen.AddEditHabit }
+                onAddHabit = { currentScreen = AppScreen.AddEditHabit },
+                onOpenStreakTracker = { habitId -> currentScreen = AppScreen.StreakTracker(habitId = habitId) }
             )
 
 
@@ -149,10 +154,10 @@ fun MomentumApp() {
                 onBack = { currentScreen = AppScreen.Home }
             )
 
+            // The 'else' branch is only for debugging unknown screens and should ideally not be hit.
             else -> {
-                // Temporarily ignore unhandled screens (like StreakTracker)
+                Text("Error: Unhandled Screen")
             }
-
         }
     }
 }
