@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
@@ -19,21 +20,15 @@ import java.util.Locale
 
 @Composable
 fun StreakCalendar(
-    // The set of all historical completion dates from the ViewModel
     completedDates: Set<LocalDate>
 ) {
-    // --- Setup for a generic calendar view ---
     val today = LocalDate.now()
-    // Start the calendar grid from the first day of the current month
     val firstDayOfMonth = today.withDayOfMonth(1)
 
-    // Calculate the number of days to display (e.g., last 4 weeks)
-    val displayRange = 35 // Enough for a 5-week grid
+    val displayRange = 35 
 
-    // Calculate the offset to start the grid on the correct day of the week
     val startDayOffset = firstDayOfMonth.dayOfWeek.value % 7
     val monthDays = (0 until displayRange).mapNotNull { offset ->
-        // Use a null placeholder for empty spots at the start of the week
         if (offset < startDayOffset) null
         else firstDayOfMonth.plusDays((offset - startDayOffset).toLong())
     }
@@ -50,7 +45,6 @@ fun StreakCalendar(
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
-            // Day Headers (S, M, T, W, T, F, S)
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                 DayOfWeek.values().forEach { day ->
                     Text(
@@ -62,7 +56,6 @@ fun StreakCalendar(
             }
             Spacer(Modifier.height(8.dp))
 
-            // Calendar Grid
             LazyVerticalGrid(
                 columns = GridCells.Fixed(7),
                 contentPadding = PaddingValues(1.dp),
@@ -76,7 +69,6 @@ fun StreakCalendar(
                         val isCompleted = completedDates.contains(date)
                         val isToday = date.isEqual(today)
 
-                        // Color based on status
                         val cellColor = when {
                             isCompleted -> MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
                             isToday -> MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f)
@@ -103,12 +95,10 @@ fun StreakCalendar(
                             }
                         }
                     } else {
-                        // Empty space for offset
                         Spacer(Modifier.aspectRatio(1f))
                     }
                 }
             }
         }
     }
-    // Contextually relevant diagram:
 }

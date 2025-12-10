@@ -25,12 +25,9 @@ import java.time.LocalDate
 
 @Composable
 fun WeeklyStreakTracker(
-    // The set of DayOfWeek that were completed in the last 7 days
     weeklyCompletedDays: Set<DayOfWeek>,
-    // The current day of the week, used to highlight 'Today'
     currentDay: Int = LocalDate.now().dayOfWeek.value
 ) {
-    // Weekdays in order (Monday=1 to Sunday=7)
     val days = DayOfWeek.values()
 
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)) {
@@ -49,11 +46,10 @@ fun WeeklyStreakTracker(
                 val isToday = dayOfWeek.value == currentDay
                 val isCompleted = weeklyCompletedDays.contains(dayOfWeek)
 
-                // Colors based on status
                 val circleColor = when {
-                    isCompleted -> MaterialTheme.colorScheme.primary // Completed
-                    isToday -> MaterialTheme.colorScheme.tertiary.copy(alpha = 0.6f) // Today
-                    else -> Color.LightGray.copy(alpha = 0.3f) // Missed/Incomplete
+                    isCompleted -> MaterialTheme.colorScheme.primary 
+                    isToday -> MaterialTheme.colorScheme.tertiary.copy(alpha = 0.6f) 
+                    else -> Color.LightGray.copy(alpha = 0.3f) 
                 }
 
                 val textColor = if (isCompleted || isToday) Color.White else Color.Black
@@ -69,7 +65,7 @@ fun WeeklyStreakTracker(
                             .background(circleColor, CircleShape)
                     ) {
                         Text(
-                            text = dayOfWeek.name.first().toString(), // M, T, W, etc.
+                            text = dayOfWeek.name.first().toString(), 
                             color = textColor,
                             fontSize = 16.sp,
                             fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal

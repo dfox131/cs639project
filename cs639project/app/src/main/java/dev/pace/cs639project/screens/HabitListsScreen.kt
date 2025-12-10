@@ -1,5 +1,6 @@
 package dev.pace.cs639project.screens
 
+import androidx.compose.foundation.clickable 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,12 +20,12 @@ import dev.pace.cs639project.data.Habit
 fun HabitListScreen(
     viewModel: FirestoreViewModel = viewModel(),
     onBack: () -> Unit,
-    onAddHabit: () -> Unit
+    onAddHabit: () -> Unit,
+    onOpenStreakTracker: (habitId: String) -> Unit
 ) {
     val habits by viewModel.habits.collectAsState()
-    val userId by viewModel.userId.collectAsState()
+    val userId = "dummy_user_id" 
 
-    // Load habits when userId is ready
     LaunchedEffect(userId) {
         userId?.let { viewModel.loadHabits(it) }
     }
@@ -65,7 +66,11 @@ fun HabitListScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(habits) { habit ->
-                        HabitCard(habit)
+                        // 2. PASSED: Pass the habit object and the new navigation callback
+                        HabitCard(
+                            habit = habit,
+                            onCardClick = onOpenStreakTracker
+                        )
                     }
                 }
             }
@@ -74,9 +79,16 @@ fun HabitListScreen(
 }
 
 @Composable
-fun HabitCard(habit: Habit) {
+fun HabitCard(
+    habit: Habit,
+    // 3. ADDED: New callback for when the card is clicked
+    onCardClick: (habitId: String) -> Unit
+) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            // 4. ADDED: Make the whole card clickable and pass the habitId
+            .clickable { onCardClick(habit.habitId) },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -104,6 +116,11 @@ fun HabitCard(habit: Habit) {
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
+
+            Button(onClick = { onCardClick(habit.habitId) }) {
+                Text("View Streak")
+            }
+
         }
     }
 }
