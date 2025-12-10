@@ -1,4 +1,4 @@
-package dev.pace.cs639project
+package dev.pace.cs639project.ui.screens
 
 import android.app.TimePickerDialog
 import android.widget.Toast

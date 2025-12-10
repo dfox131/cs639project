@@ -1,4 +1,4 @@
-package dev.pace.cs639project.screens
+package dev.pace.cs639project.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn

@@ -11,12 +11,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import dev.pace.cs639project.screens.AddHabitScreen
-import dev.pace.cs639project.screens.HabitListScreen
-import dev.pace.cs639project.screens.StreakTrackerScreen
-import dev.pace.cs639project.ApiSuggestionsScreen
-import dev.pace.cs639project.SettingsScreen
-import dev.pace.cs639project.HomeScreen
+import dev.pace.cs639project.ui.screens.AddHabitScreen
+import dev.pace.cs639project.ui.screens.ApiSuggestionsScreen
+import dev.pace.cs639project.ui.screens.HabitListScreen
+import dev.pace.cs639project.ui.screens.HomeScreen
+import dev.pace.cs639project.ui.screens.SettingsScreen
+import dev.pace.cs639project.ui.screens.StreakTrackerScreen
 import kotlinx.coroutines.launch
 
 
@@ -123,7 +123,9 @@ fun MomentumApp() {
         when (currentScreen) {
             is AppScreen.Home -> HomeScreen(
                 onOpenDrawer = { scope.launch { drawerState.open() } },
-                onOpenStreakTracker = { habitId -> currentScreen = AppScreen.StreakTracker(habitId = habitId) },
+                onOpenStreakTracker = { habitId ->
+                    currentScreen = AppScreen.StreakTracker(habitId = habitId)
+                },
                 onOpenApi = { currentScreen = AppScreen.ApiSuggestions },
                 onOpenSettings = { currentScreen = AppScreen.Settings }
             )

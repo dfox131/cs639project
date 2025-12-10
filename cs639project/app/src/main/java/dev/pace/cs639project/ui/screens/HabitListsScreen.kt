@@ -1,4 +1,4 @@
-package dev.pace.cs639project.screens
+package dev.pace.cs639project.ui.screens
 
 import androidx.compose.foundation.clickable 
 import androidx.compose.foundation.layout.*
