@@ -1,4 +1,4 @@
-package dev.pace.cs639project
+package dev.pace.cs639project.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,8 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import dev.pace.cs639project.data.Habit
-import dev.pace.cs639project.ui.component.DailyProgressPieChart
+import dev.pace.cs639project.ui.components.DailyProgressPieChart
 import dev.pace.cs639project.viewmodel.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)

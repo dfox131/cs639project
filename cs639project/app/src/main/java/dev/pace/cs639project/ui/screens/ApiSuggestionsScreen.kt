@@ -1,4 +1,4 @@
-package dev.pace.cs639project
+package dev.pace.cs639project.ui.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -21,6 +21,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.pace.cs639project.ui.components.ExerciseSuggestion
+import dev.pace.cs639project.ui.components.fakeSuggestions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -1,4 +1,4 @@
-package dev.pace.cs639project.ui.component
+package dev.pace.cs639project.ui.components
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween

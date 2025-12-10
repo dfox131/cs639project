@@ -1,4 +1,4 @@
-package dev.pace.cs639project.screens
+package dev.pace.cs639project.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -16,14 +16,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import dev.pace.cs639project.ui.component.StreakBadge
-import dev.pace.cs639project.ui.component.StreakCalendar
-import dev.pace.cs639project.ui.component.WeeklyStreakTracker
+import dev.pace.cs639project.ui.components.StreakBadge
+import dev.pace.cs639project.ui.components.StreakCalendar
+import dev.pace.cs639project.ui.components.WeeklyStreakTracker
 import dev.pace.cs639project.viewmodel.StreakTrackerViewModel
+import java.time.DayOfWeek
 import java.time.LocalDate
 @Composable fun StreakBadge(days: Int) { Text("Streak: $days Days") }
-@Composable fun WeeklyStreakTracker(weeklyCompletedDays: Set<java.time.DayOfWeek>, currentDay: Int) { Text("Weekly Tracker: ${weeklyCompletedDays.size} days") }
-@Composable fun StreakCalendar(completedDates: Set<java.time.LocalDate>) { Text("Calendar: ${completedDates.size} entries") }
+@Composable fun WeeklyStreakTracker(weeklyCompletedDays: Set<DayOfWeek>, currentDay: Int) { Text("Weekly Tracker: ${weeklyCompletedDays.size} days") }
+@Composable fun StreakCalendar(completedDates: Set<LocalDate>) { Text("Calendar: ${completedDates.size} entries") }
 
 // --------------------------------------------------------------------------
 
