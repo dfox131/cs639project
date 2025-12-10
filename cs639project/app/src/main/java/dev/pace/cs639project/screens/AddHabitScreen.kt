@@ -32,7 +32,8 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun AddHabitScreen(
     viewModel: FirestoreViewModel = viewModel(),
-    onHabitSaved: () -> Unit = {}                  // callback for navigation later if we want
+    onBack: () -> Unit,
+    onHabitSaved: () -> Unit = {}
 ) {
     val realUserId by viewModel.userId.collectAsState()
     val context = LocalContext.current
@@ -56,11 +57,8 @@ fun AddHabitScreen(
             TopAppBar(
                 title = { Text("Add/Edit Habit") },
                 navigationIcon = {
-                    IconButton(onClick = { onHabitSaved() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
-                        )
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {

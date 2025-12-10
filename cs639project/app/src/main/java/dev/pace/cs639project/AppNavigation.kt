@@ -2,6 +2,7 @@ package dev.pace.cs639project
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
@@ -92,6 +93,18 @@ fun MomentumApp() {
                 )
 
                 NavigationDrawerItem(
+                    label = { Text("Add Habit") },
+                    selected = currentScreen is AppScreen.AddEditHabit,
+                    onClick = {
+                        currentScreen = AppScreen.AddEditHabit
+                        scope.launch { drawerState.close() }
+                    },
+                    icon = { Icon(Icons.Default.Add, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+
+
+                NavigationDrawerItem(
                     label = { Text("My Habits") },
                     selected = currentScreen is AppScreen.Habits,
                     onClick = {
@@ -117,17 +130,16 @@ fun MomentumApp() {
 //            )
 
             is AppScreen.Habits -> HabitListScreen(
-                onAddHabit = {
-                    currentScreen = AppScreen.AddEditHabit
-                }
+                onBack = { currentScreen = AppScreen.Home },
+                onAddHabit = { currentScreen = AppScreen.AddEditHabit }
             )
 
 
             is AppScreen.AddEditHabit -> AddHabitScreen(
-                onHabitSaved = {
-                    currentScreen = AppScreen.Habits
-                }
+                onBack = { currentScreen = AppScreen.Home },
+                onHabitSaved = { currentScreen = AppScreen.Habits }
             )
+
 
             is AppScreen.ApiSuggestions -> ApiSuggestionsScreen(
                 onBack = { currentScreen = AppScreen.Home }
