@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import dev.pace.cs639project.data.FirestoreRepository
-import dev.pace.cs639project.data.Habit // Assuming Habit is available in data package
+import dev.pace.cs639project.data.Habit 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,11 +15,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-// --- Data Structures ---
-
-/**
- * Represents the entire UI state for the Streak Tracker Screen.
- */
+// --- UI State ---
 data class StreakTrackerUiState(
     val habitName: String? = "Loading Habit...",
     val currentStreak: Int = 0,
