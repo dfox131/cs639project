@@ -20,6 +20,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.pace.cs639project.ui.components.StreakBadge
 import dev.pace.cs639project.ui.components.StreakCalendar
 import dev.pace.cs639project.ui.components.WeeklyStreakTracker
+import dev.pace.cs639project.viewmodel.FirestoreViewModel
 import dev.pace.cs639project.viewmodel.StreakTrackerViewModel
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -45,10 +46,16 @@ fun StreakTrackerScreen(
         )
     )
 
-    // ❌ REMOVE initAuth() — ViewModel already has a valid userId
-    // LaunchedEffect(Unit) {
-    //     viewModel.initAuth()
-    // }
+    val firestoreVm: FirestoreViewModel = viewModel()
+
+    LaunchedEffect(firestoreVm) {
+        firestoreVm.habitCompleted.collect { completedHabitId ->
+            if (completedHabitId == habitId) {
+                viewModel.reload()
+            }
+        }
+    }
+
 
     val uiState by viewModel.uiState.collectAsState()
 

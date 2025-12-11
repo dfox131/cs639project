@@ -111,6 +111,10 @@ class StreakTrackerViewModel(
         }
     }
 
+    fun reload() {
+        loadHabitAndProgress()
+    }
+
     /**
      * Calculates the longest consecutive streak ending yesterday or today.
      */
