@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
@@ -22,6 +23,7 @@ import dev.pace.cs639project.viewmodel.AuthViewModel
 import dev.pace.cs639project.ui.screens.LoginScreen
 import dev.pace.cs639project.ui.screens.SignupScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
+import dev.pace.cs639project.ui.screens.ProfileScreen
 
 
 sealed class AppScreen {
@@ -32,6 +34,8 @@ sealed class AppScreen {
 
     object Habits : AppScreen()
     object AddEditHabit : AppScreen()
+
+    object Profile : AppScreen()
 }
 
 @Composable
@@ -147,6 +151,18 @@ fun MomentumApp(userId: String) {
                     icon = { Icon(Icons.Default.List, contentDescription = null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
+
+                NavigationDrawerItem(
+                    label = { Text("Profile") },
+                    selected = currentScreen is AppScreen.Profile,
+                    onClick = {
+                        currentScreen = AppScreen.Profile
+                        scope.launch { drawerState.close() }
+                    },
+                    icon = { Icon(Icons.Default.Person, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+
             }
         }
     ) {
@@ -187,8 +203,14 @@ fun MomentumApp(userId: String) {
             )
 
             is AppScreen.Settings -> SettingsScreen(
-                onBack = { currentScreen = AppScreen.Home }
+                onBack = { currentScreen = AppScreen.Home },
+                onProfileEdit = { currentScreen = AppScreen.Profile }
             )
+
+            is AppScreen.Profile -> ProfileScreen(
+                    onBack = { currentScreen = AppScreen.Home }
+                )
+
 
             else -> {
                 Text("Error: Unhandled Screen")
