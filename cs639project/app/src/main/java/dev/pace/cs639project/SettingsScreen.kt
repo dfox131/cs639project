@@ -27,7 +27,8 @@ import java.util.Locale
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit = {},
-    onNotificationClick: () -> Unit = {}
+    onNotificationClick: () -> Unit = {},
+    onProfileEdit: () -> Unit = {}
 ) {
     // local stat
     var dailyReminderOn by remember { mutableStateOf(true) }
@@ -185,14 +186,7 @@ fun SettingsScreen(
                                 fontWeight = FontWeight.Medium,
                                 color = Color(0xFF2563EB),
                                 modifier = Modifier.clickable {
-                                    // 现在先用 Toast 模拟跳转，后面接真正的 Profile 页面
-                                    Toast
-                                        .makeText(
-                                            context,
-                                            "Profile editing coming soon",
-                                            Toast.LENGTH_SHORT
-                                        )
-                                        .show()
+                                    onProfileEdit()
                                 }
                             )
                         }
