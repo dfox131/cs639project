@@ -36,8 +36,18 @@
             </intent-filter>
         </activity-alias>
 
+        <activity-alias
+            android:name="HealthPermissionUsageProvider"
+            android:exported="true"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.content.Intent#ACTION_VIEW_PERMISSION_USAGE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.health.connect.HealthConnectManager#CATEGORY_HEALTH_PERMISSIONS" />
+            </intent-filter>
+        </activity-alias>
+
     </application>
-    <!-- Check if Health Connect is installed -->
     <queries>
         <package android:name="com.google.android.apps.healthdata" />
     </queries>

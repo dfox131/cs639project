@@ -81,7 +81,6 @@ fun MomentumApp(userId: String) {
                     style = MaterialTheme.typography.titleMedium
                 )
 
-                // Home
                 NavigationDrawerItem(
                     label = { Text("Home") },
                     selected = currentScreen is AppScreen.Home,
@@ -191,7 +190,6 @@ fun MomentumApp(userId: String) {
                 onBack = { currentScreen = AppScreen.Home }
             )
 
-            // The 'else' branch is only for debugging unknown screens and should ideally not be hit.
             else -> {
                 Text("Error: Unhandled Screen")
             }
