@@ -177,10 +177,11 @@ fun MomentumApp(userId: String) {
             )
 
             is AppScreen.StreakTracker -> StreakTrackerScreen(
-                habitId = (currentScreen as AppScreen.StreakTracker).habitId ?: defaultStreakHabitId,
+                habitId = (currentScreen as AppScreen.StreakTracker).habitId!!,
                 userId = userId,
                 onNavigateBack = { currentScreen = AppScreen.Home }
             )
+
 
 
             is AppScreen.Habits -> HabitListScreen(

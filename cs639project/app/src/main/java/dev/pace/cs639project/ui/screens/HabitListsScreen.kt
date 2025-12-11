@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.pace.cs639project.viewmodel.FirestoreViewModel
@@ -75,8 +76,11 @@ fun HabitListScreen(
                         // 2. PASSED: Pass the habit object and the new navigation callback
                         HabitCard(
                             habit = habit,
-                            onCardClick = onOpenStreakTracker
+                            userId = userId,
+                            firestoreVm = viewModel,
+                            onCardClick = { onOpenStreakTracker(habit.habitId) }
                         )
+
                     }
                 }
             }
@@ -87,7 +91,8 @@ fun HabitListScreen(
 @Composable
 fun HabitCard(
     habit: Habit,
-    // 3. ADDED: New callback for when the card is clicked
+    userId: String,
+    firestoreVm: FirestoreViewModel,
     onCardClick: (habitId: String) -> Unit
 ) {
     Card(
@@ -123,8 +128,36 @@ fun HabitCard(
                 )
             }
 
-            Button(onClick = { onCardClick(habit.habitId) }) {
-                Text("View Streak")
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+
+                // VIEW STREAK BUTTON
+                Button(
+                    onClick = { onCardClick(habit.habitId) },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Text(text = "View Streak")
+                }
+
+                // MARK COMPLETED BUTTON (GREEN)
+                Button(
+                    onClick = {
+                        firestoreVm.markHabitCompleted(
+                            userId = userId,
+                            habitId = habit.habitId
+                        )
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF4CAF50),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(text = "Mark Completed")
+                }
             }
 
         }

@@ -3,6 +3,7 @@ package dev.pace.cs639project.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import dev.pace.cs639project.data.FirestoreRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -36,12 +37,26 @@ class AuthViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
+                // Create Firebase Auth account
                 auth.createUserWithEmailAndPassword(email, password).await()
 
-                _currentUserId.value = auth.currentUser?.uid
+                val uid = auth.currentUser?.uid ?: throw Exception("Signup failed")
+
+                // ⭐ CREATE Firestore user document
+                FirestoreRepository().createUser(
+                    userId = uid,
+                    email = email,
+                    sex = null,
+                    height = null,
+                    weight = null
+                )
+
+                // Update ViewModel state
+                _currentUserId.value = uid
                 _signupSuccess.value = true
                 _isLoading.value = false
 
+                // Notify UI
                 onSuccess()
 
             } catch (e: Exception) {
@@ -50,6 +65,7 @@ class AuthViewModel : ViewModel() {
             }
         }
     }
+
 
 
     /** ---------------------- LOGIN ----------------------- **/
