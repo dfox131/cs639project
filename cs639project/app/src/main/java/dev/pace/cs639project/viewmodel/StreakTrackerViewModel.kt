@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import dev.pace.cs639project.data.FirestoreRepository
-import dev.pace.cs639project.data.Habit 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,7 +12,6 @@ import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 
 // --- UI State ---
 data class StreakTrackerUiState(
@@ -26,11 +24,10 @@ data class StreakTrackerUiState(
 )
 
 // --- ViewModel ---
-
 class StreakTrackerViewModel(
     private val habitId: String,
+    private val userId: String,
     private val repo: FirestoreRepository = FirestoreRepository(),
-    private val userId: String = "default_user_id"
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(StreakTrackerUiState())
@@ -39,6 +36,7 @@ class StreakTrackerViewModel(
     private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE // YYYY-MM-DD
 
     init {
+        // as soon as the VM is created (with a real userId), load data
         loadHabitAndProgress()
     }
 
@@ -48,28 +46,34 @@ class StreakTrackerViewModel(
     private fun loadHabitAndProgress() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
+
+            // --- 1. Load Habits for this user ---
             val habitResult = repo.getUserHabits(userId)
 
-            // --- 1. Load Habit Name ---
             habitResult.onSuccess { habitsList ->
-                // Find the specific habit we are tracking using the habitId
                 val habit = habitsList.find { it.habitId == habitId }
 
                 if (habit != null) {
                     _uiState.update { it.copy(habitName = habit.name) }
                 } else {
-                    _uiState.update { it.copy(error = "Habit with ID $habitId not found for user.") }
+                    _uiState.update {
+                        it.copy(error = "Habit with ID $habitId not found for user.")
+                    }
+                    return@launch
                 }
+
             }.onFailure { e ->
-                _uiState.update { it.copy(error = "Failed to load habit details: ${e.message}") }
+                _uiState.update {
+                    it.copy(error = "Failed to load habit details: ${e.message}")
+                }
+                return@launch
             }
 
-
-            // --- 2. Fetch History & Calculate Streak ---
+            // --- 2. Load Progress for this user + habit ---
             val progressResult = repo.getHabitProgressHistory(userId, habitId)
 
             progressResult.onSuccess { history ->
-                // Extract and format the completed dates
+
                 val completedDates = history
                     .mapNotNull { data ->
                         (data["date"] as? String)?.let { dateString ->
@@ -80,12 +84,9 @@ class StreakTrackerViewModel(
                             }
                         }
                     }
-                    .toSet()
                     .filter { it.isBefore(LocalDate.now().plusDays(1)) }
                     .toSet()
 
-
-                // 3. Calculate Streak and Weekly Stats
                 val streak = calculateCurrentStreak(completedDates)
                 val weeklyDays = calculateWeeklyCompletion(completedDates)
 
@@ -112,22 +113,18 @@ class StreakTrackerViewModel(
 
     /**
      * Calculates the longest consecutive streak ending yesterday or today.
-     * Logic: Starts at the current day and checks backwards for consecutive completion.
      */
     private fun calculateCurrentStreak(completedDates: Set<LocalDate>): Int {
         var streak = 0
         var checkDate = LocalDate.now()
 
-        // If today is completed, start with 1 and check backwards from yesterday.
         if (completedDates.contains(checkDate)) {
             streak = 1
             checkDate = checkDate.minusDays(1)
         } else {
-            // If today is missed, start checking backwards from yesterday.
             checkDate = checkDate.minusDays(1)
         }
 
-        // Check for consecutive days backwards
         while (completedDates.contains(checkDate)) {
             streak++
             checkDate = checkDate.minusDays(1)
@@ -145,7 +142,6 @@ class StreakTrackerViewModel(
         val lastWeek = today.minusDays(7)
 
         completedDates.forEach { date ->
-            // Only consider completions within the last 7 days (including today) for the weekly tracker
             if (date.isAfter(lastWeek) && !date.isAfter(today)) {
                 completedDays.add(date.dayOfWeek)
             }
@@ -153,13 +149,15 @@ class StreakTrackerViewModel(
         return completedDays
     }
 
-
     companion object {
-        fun Factory(habitId: String): ViewModelProvider.Factory =
+        fun Factory(habitId: String, userId: String): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return StreakTrackerViewModel(habitId) as T
+                    return StreakTrackerViewModel(
+                        habitId = habitId,
+                        userId = userId
+                    ) as T
                 }
             }
     }

@@ -18,16 +18,22 @@ import dev.pace.cs639project.data.Habit
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HabitListScreen(
+    userId: String,
     viewModel: FirestoreViewModel = viewModel(),
     onBack: () -> Unit,
     onAddHabit: () -> Unit,
     onOpenStreakTracker: (habitId: String) -> Unit
 ) {
+    // Fire whenever userId changes (first login, or switching accounts)
+    LaunchedEffect(userId) {
+        viewModel.initAuth()
+        viewModel.loadHabits(userId)
+    }
+
     val habits by viewModel.habits.collectAsState()
-    val userId = "dummy_user_id" 
 
     LaunchedEffect(userId) {
-        userId?.let { viewModel.loadHabits(it) }
+        viewModel.loadHabits(userId)
     }
 
     Scaffold(

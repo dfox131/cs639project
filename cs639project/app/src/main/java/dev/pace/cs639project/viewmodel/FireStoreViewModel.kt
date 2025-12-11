@@ -5,10 +5,13 @@ import androidx.lifecycle.viewModelScope
 import dev.pace.cs639project.data.AuthRepository
 import dev.pace.cs639project.data.FirestoreRepository
 import dev.pace.cs639project.data.Habit
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 class FirestoreViewModel(
     private val repo: FirestoreRepository = FirestoreRepository()
@@ -21,6 +24,9 @@ class FirestoreViewModel(
     // ----------------------------
     private val _userId = MutableStateFlow<String?>(null)
     val userId: StateFlow<String?> = _userId.asStateFlow()
+
+    private val _habitCompleted = MutableSharedFlow<String>(replay = 0)
+    val habitCompleted = _habitCompleted.asSharedFlow()
 
     init {
         initAuth()
@@ -61,16 +67,12 @@ class FirestoreViewModel(
     fun loadHabits(userId: String) {
         viewModelScope.launch {
             val result = repo.getUserHabits(userId)
-
-            result
-                .onSuccess { habits ->
-                    _habits.value = habits
-                }
-                .onFailure { e ->
-                    e.printStackTrace()
-                }
+            result.onSuccess { habitsList ->
+                _habits.value = habitsList
+            }
         }
     }
+
 
     // ----------------------------
     // ADD HABIT
@@ -78,7 +80,7 @@ class FirestoreViewModel(
     fun addHabit(
         userId: String,
         habit: Habit,
-        onDone: () -> Unit = {}
+        onDone: () -> Unit
     ) {
         viewModelScope.launch {
             val result = repo.createHabit(
@@ -90,8 +92,8 @@ class FirestoreViewModel(
             )
 
             result.onSuccess {
+                loadHabits(userId) // reload list
                 onDone()
-                loadHabits(userId)
             }
         }
     }
@@ -99,14 +101,15 @@ class FirestoreViewModel(
     // ----------------------------
     // MARK HABIT COMPLETED
     // ----------------------------
-    fun markCompleted(
-        userId: String,
-        habitId: String,
-        date: String,
-        value: Int? = null
-    ) {
+    fun markHabitCompleted(userId: String, habitId: String, value: Int? = null) {
         viewModelScope.launch {
-            repo.markHabitCompleted(userId, habitId, date, value)
+            val today = LocalDate.now().toString()
+            val result = repo.markHabitCompleted(userId, habitId, today, value)
+
+            result.onSuccess {
+                _habitCompleted.emit(habitId)
+            }
         }
     }
+
 }

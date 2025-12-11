@@ -42,6 +42,11 @@ class FirestoreRepository {
         }
     }
 
+    private fun habitsCollection(userId: String) =
+        db.collection("users")
+            .document(userId)
+            .collection("habits")
+
     suspend fun getUser(userId: String): Result<Map<String, Any>?> {
         return try {
             val doc = db.collection("users").document(userId).get().await()
@@ -63,11 +68,10 @@ class FirestoreRepository {
         reminderTime: String?
     ): Result<String> {
         return try {
-            val docRef = db.collection("habits").document() // create ID first
+            val docRef = habitsCollection(userId).document()
 
             val habit = hashMapOf(
                 "habitId" to docRef.id,
-                "userId" to userId,
                 "name" to name,
                 "type" to type,
                 "goal" to goal,
@@ -85,10 +89,10 @@ class FirestoreRepository {
     }
 
 
+
     suspend fun getUserHabits(userId: String): Result<List<Habit>> {
         return try {
-            val snapshot = db.collection("habits")
-                .whereEqualTo("userId", userId)
+            val snapshot = habitsCollection(userId)
                 .get()
                 .await()
 
@@ -97,7 +101,7 @@ class FirestoreRepository {
                 if (data != null) {
                     Habit(
                         habitId = doc.id,
-                        userId = data["userId"] as? String ?: "",
+                        userId = userId, // derived from path
                         name = data["name"] as? String ?: "",
                         type = data["type"] as? String ?: "",
                         goal = (data["goal"] as? Number)?.toInt(),
@@ -111,6 +115,7 @@ class FirestoreRepository {
             Result.failure(e)
         }
     }
+
 
 
     // --------------------------

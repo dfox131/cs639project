@@ -18,6 +18,10 @@ import dev.pace.cs639project.ui.screens.HomeScreen
 import dev.pace.cs639project.ui.screens.SettingsScreen
 import dev.pace.cs639project.ui.screens.StreakTrackerScreen
 import kotlinx.coroutines.launch
+import dev.pace.cs639project.viewmodel.AuthViewModel
+import dev.pace.cs639project.ui.screens.LoginScreen
+import dev.pace.cs639project.ui.screens.SignupScreen
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 
 sealed class AppScreen {
@@ -30,9 +34,36 @@ sealed class AppScreen {
     object AddEditHabit : AppScreen()
 }
 
+@Composable
+fun AppNavigation() {
+    val authViewModel: AuthViewModel = viewModel()
+    val currentUserId by authViewModel.currentUserId.collectAsState()
+
+    // Track whether we are on login or signup
+    var showSignup by remember { mutableStateOf(false) }
+
+    if (currentUserId == null) {
+        // 🔐 User NOT logged in → show Login or Signup
+        if (showSignup) {
+            SignupScreen(
+                onSignupSuccess = { showSignup = false }, // return to login
+                onGoToLogin = { showSignup = false }
+            )
+        } else {
+            LoginScreen(
+                onLoginSuccess = { /* Firebase updates userId → recomposes to MomentumApp */ },
+                onGoToSignup = { showSignup = true }
+            )
+        }
+    } else {
+        // 🚀 User LOGGED IN → show full app with drawer navigation
+        MomentumApp(userId = currentUserId!!)
+    }
+}
+
 
 @Composable
-fun MomentumApp() {
+fun MomentumApp(userId: String) {
     var currentScreen by remember { mutableStateOf<AppScreen>(AppScreen.Home) }
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -132,10 +163,13 @@ fun MomentumApp() {
 
             is AppScreen.StreakTracker -> StreakTrackerScreen(
                 habitId = (currentScreen as AppScreen.StreakTracker).habitId ?: defaultStreakHabitId,
+                userId = userId,
                 onNavigateBack = { currentScreen = AppScreen.Home }
             )
 
+
             is AppScreen.Habits -> HabitListScreen(
+                userId = userId,   // ⭐ this comes from MainActivity → MomentumApp
                 onBack = { currentScreen = AppScreen.Home },
                 onAddHabit = { currentScreen = AppScreen.AddEditHabit },
                 onOpenStreakTracker = { habitId -> currentScreen = AppScreen.StreakTracker(habitId = habitId) }
@@ -143,6 +177,7 @@ fun MomentumApp() {
 
 
             is AppScreen.AddEditHabit -> AddHabitScreen(
+                userId = userId,
                 onBack = { currentScreen = AppScreen.Home },
                 onHabitSaved = { currentScreen = AppScreen.Habits }
             )

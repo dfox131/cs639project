@@ -27,16 +27,17 @@ import androidx.compose.ui.unit.sp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddHabitScreen(
+    userId: String,
     viewModel: FirestoreViewModel = viewModel(),
     onBack: () -> Unit,
     onHabitSaved: () -> Unit = {}
 ) {
-    val realUserId by viewModel.userId.collectAsState()
-    val context = LocalContext.current
-
     LaunchedEffect(Unit) {
         viewModel.initAuth()
     }
+
+    val realUserId = userId
+    val context = LocalContext.current
 
     var name by remember { mutableStateOf("") }
     var type by remember { mutableStateOf("custom") }
