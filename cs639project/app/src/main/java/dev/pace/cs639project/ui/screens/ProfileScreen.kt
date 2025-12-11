@@ -1,13 +1,11 @@
 package dev.pace.cs639project.ui.screens
 
-
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Notifications
@@ -22,6 +20,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.util.Locale
+
+private enum class UnitSystem { Metric, Imperial }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,14 +31,13 @@ fun ProfileScreen(
     onNotificationClick: () -> Unit = {}
 ) {
     // local
-    var userName by remember { mutableStateOf("User Name") }
-    var email by remember { mutableStateOf("user@email.com") }
-
-    var weeklyWorkoutDays by remember { mutableStateOf("4") }
-    var dailyStepGoal by remember { mutableStateOf("10000") }
-
-    var preferredTime by remember { mutableStateOf("Morning") }
-    var workoutType by remember { mutableStateOf("Light bodyweight & stretching") }
+    var email by remember { mutableStateOf("alex@example.com") }   // string
+    var sex by remember { mutableStateOf("male") }                 // "male" / "female" / "other"（可选）
+    var heightCm by remember { mutableStateOf(175.0) }             // number
+    var weightKg by remember { mutableStateOf(70.0) }              // number
+    var unitSystem by remember { mutableStateOf(UnitSystem.Metric) }
+    var heightInput by remember { mutableStateOf("175") }
+    var weightInput by remember { mutableStateOf("70") }
 
     val context = LocalContext.current
 
@@ -70,7 +70,6 @@ fun ProfileScreen(
                 .background(Color(0xFFF5F7FB))
                 .padding(innerPadding)
         ) {
-
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -78,11 +77,10 @@ fun ProfileScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
 
-                // name
+                // img
                 item {
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Box(
@@ -92,8 +90,15 @@ fun ProfileScreen(
                                 .background(Color(0xFFFFC4D6)),
                             contentAlignment = Alignment.Center
                         ) {
+                            val initial = email
+                                .takeIf { it.isNotBlank() }
+                                ?.firstOrNull()
+                                ?.uppercaseChar()
+                                ?.toString()
+                                ?: "U"
+
                             Text(
-                                text = userName.firstOrNull()?.uppercaseChar()?.toString() ?: "U",
+                                text = initial,
                                 fontSize = 40.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
@@ -103,93 +108,180 @@ fun ProfileScreen(
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Text(
-                            text = userName,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.SemiBold,
+                            text = email,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium,
                             color = Color(0xFF111827)
                         )
 
                         Text(
-                            text = email,
-                            fontSize = 14.sp,
-                            color = Color(0xFF6B7280)
+                            text = "Mapped to Firestore collection: users",
+                            fontSize = 12.sp,
+                            color = Color(0xFF6B7280),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
 
-                // Basic Info
+                // email + gender
                 item {
-                    ProfileSectionCard(title = "Basic Info") {
+                    ProfileSectionCard(title = "Account") {
                         OutlinedTextField(
-                            value = userName,
-                            onValueChange = { userName = it },
-                            label = { Text("Name") },
+                            value = email,
+                            onValueChange = { email = it },
+                            label = { Text("Email (matches Firebase Auth)") },
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth()
                         )
 
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        OutlinedTextField(
-                            value = email,
-                            onValueChange = { email = it },
-                            label = { Text("Email") },
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth()
+                        Text(
+                            text = "Gender",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color(0xFF111827)
                         )
-                    }
-                }
+                        Spacer(modifier = Modifier.height(8.dp))
 
-                // Goals
-                item {
-                    ProfileSectionCard(title = "Goals") {
+                        // male / female / other
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth()
                         ) {
-                            OutlinedTextField(
-                                value = weeklyWorkoutDays,
-                                onValueChange = { weeklyWorkoutDays = it.filter { ch -> ch.isDigit() } },
-                                label = { Text("Workout days / week") },
-                                singleLine = true,
-                                modifier = Modifier.weight(1f)
+                            SexOptionChip(
+                                label = "Male",
+                                value = "male",
+                                selected = sex == "male",
+                                onSelected = { sex = "male" }
                             )
-                            OutlinedTextField(
-                                value = dailyStepGoal,
-                                onValueChange = { dailyStepGoal = it.filter { ch -> ch.isDigit() } },
-                                label = { Text("Daily steps") },
-                                singleLine = true,
-                                modifier = Modifier.weight(1f)
+                            SexOptionChip(
+                                label = "Female",
+                                value = "female",
+                                selected = sex == "female",
+                                onSelected = { sex = "female" }
+                            )
+                            SexOptionChip(
+                                label = "Other",
+                                value = "other",
+                                selected = sex == "other",
+                                onSelected = { sex = "other" }
                             )
                         }
                     }
                 }
 
-                // Preferences
+                // measurements
                 item {
-                    ProfileSectionCard(title = "Preferences") {
-                        OutlinedTextField(
-                            value = preferredTime,
-                            onValueChange = { preferredTime = it },
-                            label = { Text("Preferred time (e.g. Morning)") },
-                            singleLine = true,
+                    ProfileSectionCard(title = "Measurements") {
+
+                        // switch unit (label + chips 分两行，防止挤）
+                        Column(
                             modifier = Modifier.fillMaxWidth()
-                        )
+                        ) {
+                            Text(
+                                text = "Unit system:",
+                                fontSize = 14.sp,
+                                color = Color(0xFF111827)
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                AssistChip(
+                                    onClick = {
+                                        unitSystem = UnitSystem.Metric
+                                        heightInput = formatNumber(heightCm)
+                                        weightInput = formatNumber(weightKg)
+                                    },
+                                    label = { Text("Metric") },
+                                    colors = AssistChipDefaults.assistChipColors(
+                                        containerColor = if (unitSystem == UnitSystem.Metric)
+                                            Color(0xFFDBEAFE) else Color(0xFFE5E7EB)
+                                    )
+                                )
+
+                                AssistChip(
+                                    onClick = {
+                                        unitSystem = UnitSystem.Imperial
+                                        heightInput = formatNumber(heightCm / 2.54)
+                                        weightInput = formatNumber(weightKg * 2.20462)
+                                    },
+                                    label = { Text("Imperial") },
+                                    colors = AssistChipDefaults.assistChipColors(
+                                        containerColor = if (unitSystem == UnitSystem.Imperial)
+                                            Color(0xFFDBEAFE) else Color(0xFFE5E7EB)
+                                    )
+                                )
+                            }
+                        }
 
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        OutlinedTextField(
-                            value = workoutType,
-                            onValueChange = { workoutType = it },
-                            label = { Text("Workout focus") },
+                        // input area
+                        Row(
                             modifier = Modifier.fillMaxWidth(),
-                            minLines = 2,
-                            maxLines = 4
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            val heightLabel = if (unitSystem == UnitSystem.Metric)
+                                "Height (cm)" else "Height (inches)"
+                            val weightLabel = if (unitSystem == UnitSystem.Metric)
+                                "Weight (kg)" else "Weight (lbs)"
+
+                            OutlinedTextField(
+                                value = heightInput,
+                                onValueChange = { new ->
+                                    val filtered = new.filter { it.isDigit() || it == '.' }
+                                    heightInput = filtered
+                                    val v = filtered.toDoubleOrNull()
+                                    if (v != null) {
+                                        heightCm = if (unitSystem == UnitSystem.Metric) {
+                                            v
+                                        } else {
+                                            v * 2.54        // in → cm
+                                        }
+                                    }
+                                },
+                                label = { Text(heightLabel) },
+                                singleLine = true,
+                                modifier = Modifier.weight(1f)
+                            )
+
+                            OutlinedTextField(
+                                value = weightInput,
+                                onValueChange = { new ->
+                                    val filtered = new.filter { it.isDigit() || it == '.' }
+                                    weightInput = filtered
+                                    val v = filtered.toDoubleOrNull()
+                                    if (v != null) {
+                                        weightKg = if (unitSystem == UnitSystem.Metric) {
+                                            v
+                                        } else {
+                                            v / 2.20462      // lbs → kg
+                                        }
+                                    }
+                                },
+                                label = { Text(weightLabel) },
+                                singleLine = true,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Text(
+                            text = "Height: cm or inches.  Weight: kg or lbs.",
+                            fontSize = 12.sp,
+                            color = Color(0xFF6B7280)
                         )
                     }
                 }
 
-                // Save
+                // save
                 item {
                     Column(
                         modifier = Modifier.fillMaxWidth(),
@@ -197,9 +289,10 @@ fun ProfileScreen(
                     ) {
                         Button(
                             onClick = {
+                                // local fake data
                                 Toast.makeText(
                                     context,
-                                    "Profile updated (local only)",
+                                    "Profile updated locally (email, sex, height, weight)",
                                     Toast.LENGTH_SHORT
                                 ).show()
                             },
@@ -216,8 +309,6 @@ fun ProfileScreen(
                         }
 
                         Spacer(modifier = Modifier.height(8.dp))
-
-
                     }
                 }
             }
@@ -225,6 +316,21 @@ fun ProfileScreen(
     }
 }
 
+@Composable
+private fun SexOptionChip(
+    label: String,
+    value: String,
+    selected: Boolean,
+    onSelected: () -> Unit
+) {
+    AssistChip(
+        onClick = onSelected,
+        label = { Text(label) },
+        colors = AssistChipDefaults.assistChipColors(
+            containerColor = if (selected) Color(0xFFDBEAFE) else Color(0xFFE5E7EB)
+        )
+    )
+}
 
 @Composable
 private fun ProfileSectionCard(
@@ -252,5 +358,14 @@ private fun ProfileSectionCard(
             Spacer(modifier = Modifier.height(8.dp))
             content()
         }
+    }
+}
+
+
+private fun formatNumber(value: Double): String {
+    return if (value % 1.0 == 0.0) {
+        String.format(Locale.getDefault(), "%.0f", value)
+    } else {
+        String.format(Locale.getDefault(), "%.1f", value)
     }
 }
