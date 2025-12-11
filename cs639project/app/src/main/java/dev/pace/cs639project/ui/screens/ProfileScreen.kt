@@ -21,25 +21,51 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.util.Locale
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import dev.pace.cs639project.viewmodel.ProfileViewModel
 
 private enum class UnitSystem { Metric, Imperial }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
+    userId: String,
     onBack: () -> Unit = {},
     onNotificationClick: () -> Unit = {}
 ) {
-    // local
-    var email by remember { mutableStateOf("alex@example.com") }   // string
-    var sex by remember { mutableStateOf("male") }                 // "male" / "female" / "other"（可选）
-    var heightCm by remember { mutableStateOf(175.0) }             // number
-    var weightKg by remember { mutableStateOf(70.0) }              // number
-    var unitSystem by remember { mutableStateOf(UnitSystem.Metric) }
-    var heightInput by remember { mutableStateOf("175") }
-    var weightInput by remember { mutableStateOf("70") }
+    val viewModel: ProfileViewModel = viewModel(
+        key = userId,  // ensures a unique VM per user
+        factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return ProfileViewModel(userId = userId) as T
+            }
+        }
+    )
+
+    val uiState by viewModel.uiState.collectAsState()
+
+    var email by remember { mutableStateOf("") }
+    var sex by remember { mutableStateOf("") }
+    var heightInput by remember { mutableStateOf("") }
+    var weightInput by remember { mutableStateOf("") }
+
+// Sync when profile loads
+    LaunchedEffect(uiState) {
+        if (!uiState.isLoading) {
+            email = uiState.email
+            sex = uiState.sex ?: ""
+            heightInput = uiState.height?.toString() ?: ""
+            weightInput = uiState.weight?.toString() ?: ""
+        }
+    }
 
     val context = LocalContext.current
+
+    var unitSystem by remember { mutableStateOf(UnitSystem.Metric) }
+    var heightCm by remember { mutableStateOf(uiState.height?.toDouble() ?: 0.0) }
+    var weightKg by remember { mutableStateOf(uiState.weight?.toDouble() ?: 0.0) }
 
     Scaffold(
         topBar = {
@@ -279,6 +305,14 @@ fun ProfileScreen(
                             color = Color(0xFF6B7280)
                         )
                     }
+
+                    if (uiState.error != null) {
+                        Text(
+                            text = uiState.error!!,
+                            color = Color.Red,
+                            modifier = Modifier.padding(8.dp)
+                        )
+                    }
                 }
 
                 // save
@@ -289,24 +323,18 @@ fun ProfileScreen(
                     ) {
                         Button(
                             onClick = {
-                                // local fake data
-                                Toast.makeText(
-                                    context,
-                                    "Profile updated locally (email, sex, height, weight)",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                viewModel.saveProfile(
+                                    email = email,
+                                    sex = sex,
+                                    height = heightInput.toIntOrNull(),
+                                    weight = weightInput.toIntOrNull()
+                                )
                             },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(48.dp),
-                            shape = RoundedCornerShape(16.dp)
+                            modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(
-                                text = "Save Changes",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium
-                            )
+                            Text("Save Changes")
                         }
+
 
                         Spacer(modifier = Modifier.height(8.dp))
                     }

@@ -72,6 +72,7 @@ fun AppNavigation() {
 
 @Composable
 fun MomentumApp(userId: String) {
+
     var currentScreen by remember { mutableStateOf<AppScreen>(AppScreen.Home) }
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -213,8 +214,9 @@ fun MomentumApp(userId: String) {
             )
 
             is AppScreen.Profile -> ProfileScreen(
-                    onBack = { currentScreen = AppScreen.Home }
-                )
+                userId = userId,
+                onBack = { currentScreen = AppScreen.Home }
+            )
 
 
             else -> {
