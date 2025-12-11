@@ -11,9 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,28 +20,49 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.platform.LocalContext 
+import androidx.activity.compose.rememberLauncherForActivityResult 
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.health.connect.client.permission.HealthPermission
+import androidx.health.connect.client.records.StepsRecord
 import dev.pace.cs639project.ui.components.DailyProgressPieChart
 import dev.pace.cs639project.viewmodel.HomeViewModel
+import dev.pace.cs639project.viewmodel.HealthViewModel 
 
+val STEPS_READ_PERMISSIONS: Set<String> = setOf(
+    HealthPermission.getReadPermission(StepsRecord::class)
+)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    // Inject the new ViewModel
     viewModel: HomeViewModel = viewModel(),
+    healthViewModel: HealthViewModel = viewModel(
+        factory = HealthViewModel.Factory(LocalContext.current.applicationContext)
+    ),
     onOpenDrawer: () -> Unit,
     onOpenStreakTracker: (habitId: String) -> Unit,
     onOpenApi: () -> Unit,
     onOpenSettings: () -> Unit
 ) {
-    // Collect the data state
     val uiState by viewModel.uiState.collectAsState()
+    val healthState by healthViewModel.uiState.collectAsState() 
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = {
+            healthViewModel.permissionsRequestCompleted()
+        }
+    )
+
+    LaunchedEffect(healthState.permissionsRequired) {
+        if (healthState.permissionsRequired) {
+            permissionLauncher.launch(STEPS_READ_PERMISSIONS.toTypedArray())
+        }
+    }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = {
-                    Text(text = "Momentum", fontWeight = FontWeight.Bold, fontSize = 22.sp)
-                },
+                title = { Text(text = "Momentum", fontWeight = FontWeight.Bold, fontSize = 22.sp) },
                 navigationIcon = {
                     IconButton(onClick = onOpenDrawer) {
                         Icon(imageVector = Icons.Default.Menu, contentDescription = "Menu")
@@ -58,16 +77,12 @@ fun HomeScreen(
         }
     ) { innerPadding ->
 
-        if (uiState.isLoading) {
-            // Show loading indicator
-            Box(
-                modifier = Modifier.fillMaxSize().padding(innerPadding),
-                contentAlignment = Alignment.Center
-            ) {
+        // --- Handle Loading and Error States ---
+        if (uiState.isLoading || healthState.isLoading) {
+            Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         } else if (uiState.error != null) {
-            // Show error message
             Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
                 Text("Error loading data: ${uiState.error}", color = MaterialTheme.colorScheme.error)
             }
@@ -80,7 +95,6 @@ fun HomeScreen(
                     .padding(horizontal = 16.dp, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // 1. Greeting and Streak (Using Data)
                 item {
                     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally ) {
                         Text(
@@ -90,29 +104,30 @@ fun HomeScreen(
                             color = Color(0xFF111827)
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        // NOTE: Streak data is complex and is best left to the StreakTrackerScreen.
-                        // For Home, we display Daily Completion.
-                        Text(
-                            text = "Daily Progress",
-                            fontSize = 14.sp,
-                            color = Color(0xFF6B7280)
-                        )
+
+                        if (healthState.permissionsGranted) {
+                            Text(
+                                text = "Steps Today: ${healthState.stepsToday}",
+                                fontSize = 16.sp,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        } else if (healthState.permissionsRequired) {
+                            PermissionPromptCard(onClick = {
+                                permissionLauncher.launch(STEPS_READ_PERMISSIONS.toTypedArray())
+                            })
+                        }
                     }
                 }
 
-                // 2. PIE CHART VISUALIZATION
                 item {
                     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        // Use the new Pie Chart component
                         DailyProgressPieChart(
                             completed = uiState.completedCount,
                             total = uiState.totalHabitsCount
                         )
-
                     }
                 }
 
-                // 3. Today's Goals
                 item {
                     Text(
                         text = "Today's Goals (${uiState.completedCount}/${uiState.totalHabitsCount})",
@@ -122,9 +137,7 @@ fun HomeScreen(
                     )
                 }
 
-                // 4. List of Goals (Using Live Data)
                 items(uiState.allHabits) { habit ->
-                    // Determine status based on live progress data
                     val isCompleted = uiState.completedHabitIds.contains(habit.habitId)
                     val statusColor = if (isCompleted) Color(0xFF22C55E) else Color(0xFF3B82F6)
 
@@ -138,7 +151,6 @@ fun HomeScreen(
                     )
                 }
 
-                // 5. API Suggestions Button
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = onOpenApi, modifier = Modifier.fillMaxWidth()) {
@@ -150,7 +162,26 @@ fun HomeScreen(
     }
 }
 
-// GoalCard is kept the same as it now correctly accepts habitId and onCardClick.
+
+@Composable
+fun PermissionPromptCard(onClick: () -> Unit) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier.padding(16.dp).fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            Text("Enable Step Tracking", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onErrorContainer)
+            Text("Tap here to authorize Health Connect access for accurate step tracking.", color = MaterialTheme.colorScheme.onErrorContainer)
+            Spacer(Modifier.height(8.dp))
+            Button(onClick = onClick) {
+                Text("Grant Permissions")
+            }
+        }
+    }
+}
+
+// GoalCard definition (kept for reference, should be defined once in the file)
 @Composable
 fun GoalCard(
     title: String,
@@ -176,7 +207,6 @@ fun GoalCard(
                 .padding(horizontal = 16.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // √
             Box(
                 modifier = Modifier
                     .size(28.dp)

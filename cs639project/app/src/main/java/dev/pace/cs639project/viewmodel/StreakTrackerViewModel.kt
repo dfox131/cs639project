@@ -17,7 +17,7 @@ import java.time.temporal.ChronoUnit
 
 // --- UI State ---
 data class StreakTrackerUiState(
-    val habitName: String? = "Loading Habit...",
+    val habitName: String? = "Streak Tracker",
     val currentStreak: Int = 0,
     val completedDates: Set<LocalDate> = emptySet(),
     val weeklyCompletionDays: Set<DayOfWeek> = emptySet(),

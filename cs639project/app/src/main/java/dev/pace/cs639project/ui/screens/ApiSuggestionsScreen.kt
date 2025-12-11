@@ -12,7 +12,8 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,38 +22,32 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.pace.cs639project.ui.components.ExerciseSuggestion
-import dev.pace.cs639project.ui.components.fakeSuggestions
+import dev.pace.cs639project.viewmodel.ApiSuggestionsViewModel // <-- NEW IMPORT
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ApiSuggestionsScreen(
     onBack: () -> Unit = {},
-    onNotificationClick: () -> Unit = {}
+    onNotificationClick: () -> Unit = {},
+    viewModel: ApiSuggestionsViewModel = viewModel() // <-- Initialize ViewModel
 ) {
     val context = LocalContext.current
-    val suggestions = remember { fakeSuggestions }
+    val uiState by viewModel.uiState.collectAsState() // <-- Collect UI State
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = {
-                    Text(text = "API Suggestions")
-                },
+                title = { Text(text = "API Suggestions") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
-                        )
+                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
                     IconButton(onClick = onNotificationClick) {
-                        Icon(
-                            imageVector = Icons.Default.Notifications,
-                            contentDescription = "Notifications"
-                        )
+                        Icon(imageVector = Icons.Default.Notifications, contentDescription = "Notifications")
                     }
                 }
             )
@@ -65,29 +60,39 @@ fun ApiSuggestionsScreen(
                 .padding(innerPadding)
         ) {
 
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
-            ) {
-
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(vertical = 16.dp),
-                    verticalArrangement = Arrangement.SpaceEvenly
+            // --- LOADING AND ERROR STATES ---
+            if (uiState.isLoading) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            } else if (uiState.error != null) {
+                Text(
+                    text = "Error: ${uiState.error}",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.align(Alignment.Center).padding(16.dp)
+                )
+            } else {
+                // --- SUCCESS STATE ---
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
                 ) {
-                    items(suggestions) { item ->
-                        ExerciseSuggestionCard(
-                            suggestion = item,
-                            onTryClick = {
-                                Toast.makeText(
-                                    context,
-                                    "You chose: ${item.name}",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        )
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(vertical = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp) 
+                    ) {
+                        items(uiState.suggestions) { item ->
+                            ExerciseSuggestionCard(
+                                suggestion = item,
+                                onTryClick = {
+                                    Toast.makeText(
+                                        context,
+                                        "You chose: ${item.name}",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            )
+                        }
                     }
                 }
             }
