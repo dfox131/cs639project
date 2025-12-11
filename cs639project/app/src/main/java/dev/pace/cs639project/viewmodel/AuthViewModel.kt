@@ -31,32 +31,35 @@ class AuthViewModel : ViewModel() {
 
     /** ---------------------- SIGNUP ----------------------- **/
 
-    fun signup(email: String, password: String, onSuccess: () -> Unit) {
+    fun signup(
+        email: String,
+        password: String,
+        sex: String?,
+        height: Int?,
+        weight: Int?,
+        onSuccess: () -> Unit
+    ) {
         _isLoading.value = true
         _error.value = null
 
         viewModelScope.launch {
             try {
-                // Create Firebase Auth account
                 auth.createUserWithEmailAndPassword(email, password).await()
 
                 val uid = auth.currentUser?.uid ?: throw Exception("Signup failed")
 
-                // ⭐ CREATE Firestore user document
                 FirestoreRepository().createUser(
                     userId = uid,
                     email = email,
-                    sex = null,
-                    height = null,
-                    weight = null
+                    sex = sex,
+                    height = height,
+                    weight = weight
                 )
 
-                // Update ViewModel state
                 _currentUserId.value = uid
                 _signupSuccess.value = true
                 _isLoading.value = false
 
-                // Notify UI
                 onSuccess()
 
             } catch (e: Exception) {
@@ -65,6 +68,7 @@ class AuthViewModel : ViewModel() {
             }
         }
     }
+
 
 
 

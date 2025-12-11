@@ -47,19 +47,23 @@ fun AppNavigation() {
     var showSignup by remember { mutableStateOf(false) }
 
     if (currentUserId == null) {
-        // 🔐 User NOT logged in → show Login or Signup
+
         if (showSignup) {
+
             SignupScreen(
-                onSignupSuccess = { showSignup = false }, // return to login
-                onGoToLogin = { showSignup = false }
+                onSignupSuccess = { showSignup = false },
+                onBackToLogin = { showSignup = false }
             )
+
         } else {
+
             LoginScreen(
-                onLoginSuccess = { /* Firebase updates userId → recomposes to MomentumApp */ },
+                onLoginSuccess = { /* Firebase sets userId → recompose */ },
                 onGoToSignup = { showSignup = true }
             )
         }
-    } else {
+    }
+    else {
         // 🚀 User LOGGED IN → show full app with drawer navigation
         MomentumApp(userId = currentUserId!!)
     }

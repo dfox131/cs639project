@@ -4,63 +4,168 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.pace.cs639project.viewmodel.AuthViewModel
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignupScreen(
+    viewModel: AuthViewModel = viewModel(),
     onSignupSuccess: () -> Unit,
-    onGoToLogin: () -> Unit,
-    authViewModel: AuthViewModel = viewModel()
+    onBackToLogin: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
 
-    // 🔥 fixed: ViewModel exposes “error”
-    val errorMessage by authViewModel.error.collectAsState()
+    // NEW FIELDS
+    val sexOptions = listOf("Male", "Female", "Other")
+    var selectedSex by remember { mutableStateOf<String?>(null) }
+    var expanded by remember { mutableStateOf(false) }
+
+    var height by remember { mutableStateOf("") }
+    var weight by remember { mutableStateOf("") }
+
+    val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.Center
     ) {
-        Text("Create Account", style = MaterialTheme.typography.headlineMedium)
 
+        Text("Create Account", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+
+        Spacer(Modifier.height(20.dp))
+
+        // Email
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
             label = { Text("Email") },
+            singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
 
+        // Secure Password Field
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
             label = { Text("Password") },
+            singleLine = true,
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            visualTransformation = if (passwordVisible) VisualTransformation.None
+            else PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            trailingIcon = {
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(
+                        imageVector = if (passwordVisible) Icons.Default.VisibilityOff
+                        else Icons.Default.Visibility,
+                        contentDescription = "Toggle Password Visibility"
+                    )
+                }
+            }
         )
 
-        if (errorMessage != null) {
-            Text(
-                text = errorMessage!!,
-                color = MaterialTheme.colorScheme.error
+        Spacer(Modifier.height(16.dp))
+
+        /** ------------------- NEW FIELDS ------------------- **/
+
+        // Sex Dropdown
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+
+            OutlinedTextField(
+                value = selectedSex ?: "Select Sex",
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Sex") },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
             )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                sexOptions.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option) },
+                        onClick = {
+                            selectedSex = option
+                            expanded = false
+                        }
+                    )
+                }
+            }
         }
 
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = {
-                authViewModel.signup(email, password, onSignupSuccess)
+        Spacer(Modifier.height(12.dp))
 
-            }
+        // Height
+        OutlinedTextField(
+            value = height,
+            onValueChange = { height = it },
+            label = { Text("Height (cm)") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+
+        // Weight
+        OutlinedTextField(
+            value = weight,
+            onValueChange = { weight = it },
+            label = { Text("Weight (kg)") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+
+        Spacer(Modifier.height(20.dp))
+
+        Button(
+            onClick = {
+                viewModel.signup(
+                    email = email,
+                    password = password,
+                    sex = selectedSex,
+                    height = height.toIntOrNull(),
+                    weight = weight.toIntOrNull(),
+                    onSuccess = onSignupSuccess
+                )
+            },
+            enabled = !isLoading,
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text("Sign Up")
         }
 
-        TextButton(onClick = onGoToLogin) {
+        if (error != null) {
+            Text(error!!, color = Color.Red, modifier = Modifier.padding(top = 8.dp))
+        }
+
+        TextButton(onClick = onBackToLogin) {
             Text("Already have an account? Log in")
         }
     }
