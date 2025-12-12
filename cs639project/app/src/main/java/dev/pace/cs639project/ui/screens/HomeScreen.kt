@@ -26,11 +26,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.StepsRecord
 import dev.pace.cs639project.ui.components.DailyProgressPieChart
-import dev.pace.cs639project.ui.components.SavedConfirmationMessage
 import dev.pace.cs639project.viewmodel.HomeViewModel
 import dev.pace.cs639project.viewmodel.HealthViewModel
-import dev.pace.cs639project.viewmodel.AuthViewModel
-import kotlinx.coroutines.delay
 
 val STEPS_READ_PERMISSIONS: Set<String> = setOf(
     HealthPermission.getReadPermission(StepsRecord::class)
@@ -39,7 +36,7 @@ val STEPS_READ_PERMISSIONS: Set<String> = setOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    userId: String, // ✅ REQUIRED
+    userId: String,
     viewModel: HomeViewModel = viewModel(),
     healthViewModel: HealthViewModel = viewModel(
         factory = HealthViewModel.Factory(LocalContext.current.applicationContext)
@@ -52,7 +49,7 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsState()
     val healthState by healthViewModel.uiState.collectAsState()
 
-    // ✅ Load Home data whenever userId is available/changes
+    // ✅ REQUIRED: load data for authenticated user
     LaunchedEffect(userId) {
         viewModel.loadDailyData(userId)
     }
@@ -61,9 +58,6 @@ fun HomeScreen(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
         onResult = { healthViewModel.permissionsRequestCompleted() }
     )
-
-    val authViewModel: AuthViewModel = viewModel()
-    val justSignedUp by authViewModel.justSignedUp.collectAsState()
 
     LaunchedEffect(healthState.permissionsRequired) {
         if (healthState.permissionsRequired) {
@@ -94,7 +88,6 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-
             when {
                 uiState.isLoading || healthState.isLoading -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -188,21 +181,11 @@ fun HomeScreen(
                     }
                 }
             }
-
-            if (justSignedUp) {
-                SavedConfirmationMessage("Account created successfully 🎉")
-                LaunchedEffect(Unit) {
-                    delay(2000)
-                    authViewModel.clearSignupFlag()
-                }
-            }
         }
     }
 }
 
-/* -------------------------------------------------------------------------- */
-/* SUPPORTING COMPOSABLES                                                      */
-/* -------------------------------------------------------------------------- */
+/* ---------------- Supporting composables ---------------- */
 
 @Composable
 fun PermissionPromptCard(onClick: () -> Unit) {
@@ -240,8 +223,7 @@ fun GoalCard(
     statusLabel: String,
     statusColor: Color,
     habitId: String,
-    onCardClick: (habitId: String) -> Unit,
-    extraRightText: String? = null
+    onCardClick: (habitId: String) -> Unit
 ) {
     Surface(
         shape = RoundedCornerShape(30.dp),

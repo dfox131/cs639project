@@ -145,12 +145,12 @@ fun ProfileScreen(
 
                     Text(email, fontSize = 16.sp, fontWeight = FontWeight.Medium, color = textColor)
 
-                    Text(
-                        "Mapped to Firestore collection: users",
-                        fontSize = 12.sp,
-                        color = subTextColor,
-                        textAlign = TextAlign.Center
-                    )
+                    //Text(
+                       // "Mapped to Firestore collection: users",
+                       // fontSize = 12.sp,
+                        //color = subTextColor,
+                       // textAlign = TextAlign.Center
+                   // )
                 }
             }
 

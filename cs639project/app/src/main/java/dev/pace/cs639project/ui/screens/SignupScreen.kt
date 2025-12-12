@@ -1,11 +1,12 @@
 package dev.pace.cs639project.ui.screens
 
+import android.widget.Toast // 引入 Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext // 引入 LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,7 +44,9 @@ fun SignupScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
 
-    // 🔹 ROOT BOX (allows overlay)
+    val context = LocalContext.current
+
+    // 🔹 ROOT BOX
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -164,6 +167,8 @@ fun SignupScreen(
                         height = height.toIntOrNull(),
                         weight = weight.toIntOrNull(),
                         onSuccess = {
+                            // 🔥 这里改了：显示 Toast，然后执行跳转逻辑
+                            Toast.makeText(context, "Account created successfully 🎉", Toast.LENGTH_SHORT).show()
                             onSignupSuccess()
                         }
                     )
@@ -186,6 +191,5 @@ fun SignupScreen(
                 Text("Already have an account? Log in")
             }
         }
-
     }
 }
