@@ -20,21 +20,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.ui.platform.LocalContext 
-import androidx.activity.compose.rememberLauncherForActivityResult 
+import androidx.compose.ui.platform.LocalContext
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.StepsRecord
 import dev.pace.cs639project.ui.components.DailyProgressPieChart
 import dev.pace.cs639project.viewmodel.HomeViewModel
 import dev.pace.cs639project.viewmodel.HealthViewModel
-import dev.pace.cs639project.ui.components.SavedConfirmationMessage
-import dev.pace.cs639project.viewmodel.AuthViewModel
-import kotlinx.coroutines.delay
+
 
 val STEPS_READ_PERMISSIONS: Set<String> = setOf(
     HealthPermission.getReadPermission(StepsRecord::class)
 )
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -48,7 +47,7 @@ fun HomeScreen(
     onOpenSettings: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val healthState by healthViewModel.uiState.collectAsState() 
+    val healthState by healthViewModel.uiState.collectAsState()
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
         onResult = {
@@ -56,8 +55,6 @@ fun HomeScreen(
         }
     )
 
-    val authViewModel: AuthViewModel = viewModel()
-    val justSignedUp by authViewModel.justSignedUp.collectAsState()
 
     LaunchedEffect(healthState.permissionsRequired) {
         if (healthState.permissionsRequired) {
@@ -91,11 +88,11 @@ fun HomeScreen(
 
             // --- Handle Loading and Error States ---
             if (uiState.isLoading || healthState.isLoading) {
-                Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
             } else if (uiState.error != null) {
-                Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text("Error loading data: ${uiState.error}", color = MaterialTheme.colorScheme.error)
                 }
             } else {
@@ -103,7 +100,6 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Color(0xFFF5F7FB))
-                        .padding(innerPadding)
                         .padding(horizontal = 16.dp, vertical = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
@@ -171,16 +167,6 @@ fun HomeScreen(
                     }
                 }
             }
-            if (justSignedUp) {
-                SavedConfirmationMessage(
-                    message = "Account created successfully 🎉"
-                )
-
-                LaunchedEffect(Unit) {
-                    delay(2000)
-                    authViewModel.clearSignupFlag()
-                }
-            }
 
         }
     }
@@ -205,7 +191,6 @@ fun PermissionPromptCard(onClick: () -> Unit) {
     }
 }
 
-// GoalCard definition (kept for reference, should be defined once in the file)
 @Composable
 fun GoalCard(
     title: String,

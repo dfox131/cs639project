@@ -253,6 +253,7 @@ fun SettingsScreen(
 
                     Button(
                         onClick = {
+                            Toast.makeText(context, "Logged out successfully", Toast.LENGTH_SHORT).show()
                             authViewModel.logout()
                         },
                         modifier = Modifier.fillMaxWidth(),

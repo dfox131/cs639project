@@ -22,17 +22,6 @@ class AuthViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val _loginSuccess = MutableStateFlow(false)
-    val loginSuccess: StateFlow<Boolean> = _loginSuccess
-
-    private val _signupSuccess = MutableStateFlow(false)
-    val signupSuccess: StateFlow<Boolean> = _signupSuccess
-
-    private val _justSignedUp = MutableStateFlow(false)
-    val justSignedUp: StateFlow<Boolean> = _justSignedUp
-
-    private val _logoutSuccess = MutableStateFlow(false)
-    val logoutSuccess: StateFlow<Boolean> = _logoutSuccess
 
 
     /** ---------------------- SIGNUP ----------------------- **/
@@ -63,8 +52,7 @@ class AuthViewModel : ViewModel() {
                 )
 
                 _currentUserId.value = uid
-                _justSignedUp.value = true   // ⭐ FLAG HERE
-                _signupSuccess.value = true
+                // _justSignedUp.value = true
                 _isLoading.value = false
 
                 onSuccess()
@@ -75,11 +63,6 @@ class AuthViewModel : ViewModel() {
             }
         }
     }
-
-    fun clearSignupFlag() {
-        _justSignedUp.value = false
-    }
-
 
     /** ---------------------- LOGIN ----------------------- **/
 
@@ -92,10 +75,9 @@ class AuthViewModel : ViewModel() {
                 auth.signInWithEmailAndPassword(email, password).await()
 
                 _currentUserId.value = auth.currentUser?.uid
-                _loginSuccess.value = true
                 _isLoading.value = false
 
-                onSuccess() // 🔥 tell UI to navigate
+                onSuccess()
 
             } catch (e: Exception) {
                 _error.value = e.message
@@ -104,29 +86,17 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-
-
     /** ---------------------- LOGOUT ----------------------- **/
 
     fun logout() {
         auth.signOut()
         _currentUserId.value = null
-        _logoutSuccess.value = true
+        // _logoutSuccess.value = true
     }
-
-    fun clearLogoutSuccess() {
-        _logoutSuccess.value = false
-    }
-
 
     /** ---------------------- UI Helpers ----------------------- **/
 
     fun clearError() {
         _error.value = null
-    }
-
-    fun resetFlags() {
-        _loginSuccess.value = false
-        _signupSuccess.value = false
     }
 }
