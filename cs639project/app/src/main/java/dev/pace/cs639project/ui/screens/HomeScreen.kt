@@ -27,7 +27,10 @@ import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.StepsRecord
 import dev.pace.cs639project.ui.components.DailyProgressPieChart
 import dev.pace.cs639project.viewmodel.HomeViewModel
-import dev.pace.cs639project.viewmodel.HealthViewModel 
+import dev.pace.cs639project.viewmodel.HealthViewModel
+import dev.pace.cs639project.ui.components.SavedConfirmationMessage
+import dev.pace.cs639project.viewmodel.AuthViewModel
+import kotlinx.coroutines.delay
 
 val STEPS_READ_PERMISSIONS: Set<String> = setOf(
     HealthPermission.getReadPermission(StepsRecord::class)
@@ -53,6 +56,9 @@ fun HomeScreen(
         }
     )
 
+    val authViewModel: AuthViewModel = viewModel()
+    val justSignedUp by authViewModel.justSignedUp.collectAsState()
+
     LaunchedEffect(healthState.permissionsRequired) {
         if (healthState.permissionsRequired) {
             permissionLauncher.launch(STEPS_READ_PERMISSIONS.toTypedArray())
@@ -77,87 +83,105 @@ fun HomeScreen(
         }
     ) { innerPadding ->
 
-        // --- Handle Loading and Error States ---
-        if (uiState.isLoading || healthState.isLoading) {
-            Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        } else if (uiState.error != null) {
-            Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
-                Text("Error loading data: ${uiState.error}", color = MaterialTheme.colorScheme.error)
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color(0xFFF5F7FB))
-                    .padding(innerPadding)
-                    .padding(horizontal = 16.dp, vertical = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                item {
-                    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+
+            // --- Handle Loading and Error States ---
+            if (uiState.isLoading || healthState.isLoading) {
+                Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else if (uiState.error != null) {
+                Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
+                    Text("Error loading data: ${uiState.error}", color = MaterialTheme.colorScheme.error)
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color(0xFFF5F7FB))
+                        .padding(innerPadding)
+                        .padding(horizontal = 16.dp, vertical = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    item {
+                        Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally ) {
+                            Text(
+                                text = "Good Morning ${uiState.userName}",
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color(0xFF111827)
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            if (healthState.permissionsGranted) {
+                                Text(
+                                    text = "Steps Today: ${healthState.stepsToday}",
+                                    fontSize = 16.sp,
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                            } else if (healthState.permissionsRequired) {
+                                PermissionPromptCard(onClick = {
+                                    permissionLauncher.launch(STEPS_READ_PERMISSIONS.toTypedArray())
+                                })
+                            }
+                        }
+                    }
+
+                    item {
+                        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                            DailyProgressPieChart(
+                                completed = uiState.completedCount,
+                                total = uiState.totalHabitsCount
+                            )
+                        }
+                    }
+
+                    item {
                         Text(
-                            text = "Good Morning ${uiState.userName}",
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Medium,
+                            text = "Today's Goals (${uiState.completedCount}/${uiState.totalHabitsCount})",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.SemiBold,
                             color = Color(0xFF111827)
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                    }
 
-                        if (healthState.permissionsGranted) {
-                            Text(
-                                text = "Steps Today: ${healthState.stepsToday}",
-                                fontSize = 16.sp,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-                        } else if (healthState.permissionsRequired) {
-                            PermissionPromptCard(onClick = {
-                                permissionLauncher.launch(STEPS_READ_PERMISSIONS.toTypedArray())
-                            })
+                    items(uiState.allHabits) { habit ->
+                        val isCompleted = uiState.completedHabitIds.contains(habit.habitId)
+                        val statusColor = if (isCompleted) Color(0xFF22C55E) else Color(0xFF3B82F6)
+
+                        GoalCard(
+                            title = habit.name,
+                            subtitle = if (isCompleted) "Completed Today" else "Ready to start",
+                            statusLabel = if (isCompleted) "Done" else "Start",
+                            statusColor = statusColor,
+                            habitId = habit.habitId,
+                            onCardClick = onOpenStreakTracker
+                        )
+                    }
+
+                    item {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Button(onClick = onOpenApi, modifier = Modifier.fillMaxWidth()) {
+                            Text("Explore New Habit Ideas (API)")
                         }
                     }
                 }
+            }
+            if (justSignedUp) {
+                SavedConfirmationMessage(
+                    message = "Account created successfully 🎉"
+                )
 
-                item {
-                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        DailyProgressPieChart(
-                            completed = uiState.completedCount,
-                            total = uiState.totalHabitsCount
-                        )
-                    }
-                }
-
-                item {
-                    Text(
-                        text = "Today's Goals (${uiState.completedCount}/${uiState.totalHabitsCount})",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF111827)
-                    )
-                }
-
-                items(uiState.allHabits) { habit ->
-                    val isCompleted = uiState.completedHabitIds.contains(habit.habitId)
-                    val statusColor = if (isCompleted) Color(0xFF22C55E) else Color(0xFF3B82F6)
-
-                    GoalCard(
-                        title = habit.name,
-                        subtitle = if (isCompleted) "Completed Today" else "Ready to start",
-                        statusLabel = if (isCompleted) "Done" else "Start",
-                        statusColor = statusColor,
-                        habitId = habit.habitId,
-                        onCardClick = onOpenStreakTracker
-                    )
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(onClick = onOpenApi, modifier = Modifier.fillMaxWidth()) {
-                        Text("Explore New Habit Ideas (API)")
-                    }
+                LaunchedEffect(Unit) {
+                    delay(2000)
+                    authViewModel.clearSignupFlag()
                 }
             }
+
         }
     }
 }

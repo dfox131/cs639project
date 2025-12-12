@@ -28,6 +28,9 @@ class AuthViewModel : ViewModel() {
     private val _signupSuccess = MutableStateFlow(false)
     val signupSuccess: StateFlow<Boolean> = _signupSuccess
 
+    private val _justSignedUp = MutableStateFlow(false)
+    val justSignedUp: StateFlow<Boolean> = _justSignedUp
+
 
     /** ---------------------- SIGNUP ----------------------- **/
 
@@ -57,6 +60,7 @@ class AuthViewModel : ViewModel() {
                 )
 
                 _currentUserId.value = uid
+                _justSignedUp.value = true   // ⭐ FLAG HERE
                 _signupSuccess.value = true
                 _isLoading.value = false
 
@@ -69,7 +73,9 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-
+    fun clearSignupFlag() {
+        _justSignedUp.value = false
+    }
 
 
     /** ---------------------- LOGIN ----------------------- **/
