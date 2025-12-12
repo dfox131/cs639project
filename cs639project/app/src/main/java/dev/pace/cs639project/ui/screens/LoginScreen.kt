@@ -14,6 +14,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import dev.pace.cs639project.ui.components.SavedConfirmationMessage
 
 
 @Composable
@@ -29,12 +30,28 @@ fun LoginScreen(
     val error by viewModel.error.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
+    val authViewModel: AuthViewModel = viewModel()
+    val logoutSuccess by authViewModel.logoutSuccess.collectAsState()
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+
+        if (logoutSuccess) {
+            SavedConfirmationMessage(message = "Logged out successfully")
+        }
+
+        LaunchedEffect(logoutSuccess) {
+            if (logoutSuccess) {
+                kotlinx.coroutines.delay(1500)
+                authViewModel.clearLogoutSuccess()
+            }
+        }
+
 
         Text("Login", style = MaterialTheme.typography.headlineMedium)
 

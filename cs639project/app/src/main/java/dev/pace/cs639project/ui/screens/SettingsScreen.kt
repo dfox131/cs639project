@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.lang.String.format
 import java.util.Locale
+import androidx.lifecycle.viewmodel.compose.viewModel
+import dev.pace.cs639project.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,6 +39,8 @@ fun SettingsScreen(
     var notificationTime by remember { mutableStateOf("7:00 AM") }
     var showTimeDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
+
+    val authViewModel: AuthViewModel = viewModel()
 
     // theme color
     val backgroundColor = if (isDarkTheme) Color(0xFF020617) else Color(0xFFF5F7FB)
@@ -244,10 +248,25 @@ fun SettingsScreen(
                             )
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Button(
+                        onClick = {
+                            authViewModel.logout()
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error
+                        )
+                    ) {
+                        Text(
+                            text = "Log Out",
+                            color = MaterialTheme.colorScheme.onError
+                        )
+                    }
                 }
-            }
-
-
+        }
         }
     }
 }

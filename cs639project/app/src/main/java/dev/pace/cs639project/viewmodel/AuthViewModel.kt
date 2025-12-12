@@ -31,6 +31,9 @@ class AuthViewModel : ViewModel() {
     private val _justSignedUp = MutableStateFlow(false)
     val justSignedUp: StateFlow<Boolean> = _justSignedUp
 
+    private val _logoutSuccess = MutableStateFlow(false)
+    val logoutSuccess: StateFlow<Boolean> = _logoutSuccess
+
 
     /** ---------------------- SIGNUP ----------------------- **/
 
@@ -108,6 +111,11 @@ class AuthViewModel : ViewModel() {
     fun logout() {
         auth.signOut()
         _currentUserId.value = null
+        _logoutSuccess.value = true
+    }
+
+    fun clearLogoutSuccess() {
+        _logoutSuccess.value = false
     }
 
 
