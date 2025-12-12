@@ -28,21 +28,22 @@ import java.util.Locale
 fun SettingsScreen(
     onBack: () -> Unit = {},
     onNotificationClick: () -> Unit = {},
-    onProfileEdit: () -> Unit = {}
+    onProfileEdit: () -> Unit = {},
+    isDarkTheme: Boolean,
+    onThemeChanged: (Boolean) -> Unit
 ) {
     // local stat
     var dailyReminderOn by remember { mutableStateOf(true) }
     var notificationTime by remember { mutableStateOf("7:00 AM") }
-    var darkModeOn by remember { mutableStateOf(false) }
     var showTimeDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     // theme color
-    val backgroundColor = if (darkModeOn) Color(0xFF020617) else Color(0xFFF5F7FB)
-    val cardColor = if (darkModeOn) Color(0xFF111827) else Color.White
-    val borderColor = if (darkModeOn) Color(0xFFEEEEEE) else Color(0xFF111827)
-    val primaryTextColor = if (darkModeOn) Color.White else Color(0xFF111827)
-    val secondaryTextColor = if (darkModeOn) Color(0xFFCBD5F5) else Color(0xFF6B7280)
+    val backgroundColor = if (isDarkTheme) Color(0xFF020617) else Color(0xFFF5F7FB)
+    val cardColor = if (isDarkTheme) Color(0xFF111827) else Color.White
+    val borderColor = if (isDarkTheme) Color(0xFF374151) else Color(0xFFEEEEEE)
+    val primaryTextColor = if (isDarkTheme) Color.White else Color(0xFF111827)
+    val secondaryTextColor = if (isDarkTheme) Color(0xFF9CA3AF) else Color(0xFF6B7280)
 
     Scaffold(
         topBar = {
@@ -210,14 +211,14 @@ fun SettingsScreen(
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "App version 1.0.0",
+                                    text = if (isDarkTheme) "Dark Mode" else "Light Mode",
                                     fontSize = 14.sp,
                                     color = secondaryTextColor
                                 )
                             }
                             Switch(
-                                checked = darkModeOn,
-                                onCheckedChange = { darkModeOn = it }
+                                checked = isDarkTheme,
+                                onCheckedChange = { onThemeChanged(it) }
                             )
                         }
                     }
