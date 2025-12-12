@@ -142,10 +142,15 @@ fun HomeScreen(
                         }
 
                         item {
-                            DailyProgressPieChart(
-                                completed = uiState.completedCount,
-                                total = uiState.totalHabitsCount
-                            )
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                DailyProgressPieChart(
+                                    completed = uiState.completedCount,
+                                    total = uiState.totalHabitsCount
+                                )
+                            }
                         }
 
                         item {
