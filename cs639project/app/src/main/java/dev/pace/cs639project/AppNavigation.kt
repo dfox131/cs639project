@@ -78,14 +78,12 @@ fun AppNavigation(
 
 
 @Composable
-
 fun MomentumApp(
     userId: String,
     isDarkTheme: Boolean,
     onThemeChanged: (Boolean) -> Unit
 ) {
-
-fun MomentumApp(userId: String) {
+    // ⚠️ 之前这里有一行错误的 "fun MomentumApp(userId: String) {" 导致了语法错误，已删除
 
     var currentScreen by remember { mutableStateOf<AppScreen>(AppScreen.Home) }
 
@@ -202,7 +200,7 @@ fun MomentumApp(userId: String) {
             )
 
             is AppScreen.Habits -> HabitListScreen(
-                userId = userId,   // ⭐ this comes from MainActivity → MomentumApp
+                userId = userId,
                 onBack = { currentScreen = AppScreen.Home },
                 onAddHabit = { currentScreen = AppScreen.AddEditHabit },
                 onOpenStreakTracker = { habitId -> currentScreen = AppScreen.StreakTracker(habitId = habitId) }
@@ -225,11 +223,11 @@ fun MomentumApp(userId: String) {
                 onThemeChanged = onThemeChanged
             )
 
+            // ⚠️ 修复了这里的参数传递：去掉了重复的 onBack，保留了 userId 和 isDarkTheme
             is AppScreen.Profile -> ProfileScreen(
                 onBack = { currentScreen = AppScreen.Home },
-                isDarkTheme = isDarkTheme
-                userId = userId,
-                onBack = { currentScreen = AppScreen.Home }
+                isDarkTheme = isDarkTheme,
+                userId = userId
             )
 
 
