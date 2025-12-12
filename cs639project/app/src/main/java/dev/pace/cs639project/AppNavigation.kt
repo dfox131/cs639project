@@ -125,24 +125,13 @@ fun MomentumApp(
                 )
 
                 NavigationDrawerItem(
-                    label = { Text("API Suggestions") },
-                    selected = currentScreen is AppScreen.ApiSuggestions,
+                    label = { Text("My Habits") },
+                    selected = currentScreen is AppScreen.Habits,
                     onClick = {
-                        currentScreen = AppScreen.ApiSuggestions
+                        currentScreen = AppScreen.Habits
                         scope.launch { drawerState.close() }
                     },
                     icon = { Icon(Icons.Default.List, contentDescription = null) },
-                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                )
-
-                NavigationDrawerItem(
-                    label = { Text("Settings") },
-                    selected = currentScreen is AppScreen.Settings,
-                    onClick = {
-                        currentScreen = AppScreen.Settings
-                        scope.launch { drawerState.close() }
-                    },
-                    icon = { Icon(Icons.Default.Settings, contentDescription = null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
 
@@ -157,12 +146,11 @@ fun MomentumApp(
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
 
-
                 NavigationDrawerItem(
-                    label = { Text("My Habits") },
-                    selected = currentScreen is AppScreen.Habits,
+                    label = { Text("API Suggestions") },
+                    selected = currentScreen is AppScreen.ApiSuggestions,
                     onClick = {
-                        currentScreen = AppScreen.Habits
+                        currentScreen = AppScreen.ApiSuggestions
                         scope.launch { drawerState.close() }
                     },
                     icon = { Icon(Icons.Default.List, contentDescription = null) },
@@ -180,6 +168,16 @@ fun MomentumApp(
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
 
+                NavigationDrawerItem(
+                    label = { Text("Settings") },
+                    selected = currentScreen is AppScreen.Settings,
+                    onClick = {
+                        currentScreen = AppScreen.Settings
+                        scope.launch { drawerState.close() }
+                    },
+                    icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
             }
         }
     ) {
