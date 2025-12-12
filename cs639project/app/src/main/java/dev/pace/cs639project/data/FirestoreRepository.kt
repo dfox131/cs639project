@@ -8,6 +8,9 @@ import kotlinx.coroutines.tasks.await
 class FirestoreRepository {
 
     private val db = FirebaseFirestore.getInstance()
+    private val firestore = FirebaseFirestore.getInstance()
+    private val usersCollection = firestore.collection("users")
+
 
     // --------------------------
     // USERS
@@ -185,4 +188,30 @@ class FirestoreRepository {
             Result.failure(e)
         }
     }
+
+    suspend fun getUserProfile(userId: String): User? {
+        return try {
+            val snapshot = usersCollection.document(userId).get().await()
+            snapshot.toObject(User::class.java)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    suspend fun updateUserProfile(
+        userId: String,
+        email: String,
+        sex: String?,
+        height: Int?,
+        weight: Int?
+    ) {
+        val updates = mapOf(
+            "email" to email,
+            "sex" to sex,
+            "height" to height,
+            "weight" to weight
+        )
+        usersCollection.document(userId).update(updates).await()
+    }
+
 }
