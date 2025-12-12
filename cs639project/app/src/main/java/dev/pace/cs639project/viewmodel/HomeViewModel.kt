@@ -31,24 +31,23 @@ class HomeViewModel(
 
     private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE // YYYY-MM-DD
 
-    // NOTE: This must be replaced with the actual authenticated user ID
-    private val currentUserId: String = "default_user_id"
-
-    init {
-        loadDailyData()
-    }
-
-    fun loadDailyData() {
+    /**
+     * Explicitly load all data for the given user.
+     * This must be called by the screen (HomeScreen).
+     */
+    fun loadDailyData(userId: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
 
-            // 1. Fetch All Habits for the user
-            val habitsResult = repo.getUserHabits(currentUserId)
             val todayDate = LocalDate.now().format(dateFormatter)
 
+            // 1️⃣ Fetch all habits for the user
+            val habitsResult = repo.getUserHabits(userId)
+
             habitsResult.onSuccess { habits ->
-                // 2. Fetch Today's Progress
-                val progressResult = repo.getTodayProgress(currentUserId, todayDate)
+
+                // 2️⃣ Fetch today's progress for the same user
+                val progressResult = repo.getTodayProgress(userId, todayDate)
 
                 progressResult.onSuccess { progressList ->
 
@@ -56,24 +55,32 @@ class HomeViewModel(
                         .mapNotNull { it["habitId"] as? String }
                         .toSet()
 
-                    val completedCount = completedIds.size
-                    val totalCount = habits.size
-
                     _uiState.update {
                         it.copy(
                             allHabits = habits,
                             completedHabitIds = completedIds,
-                            totalHabitsCount = totalCount,
-                            completedCount = completedCount,
+                            totalHabitsCount = habits.size,
+                            completedCount = completedIds.size,
                             isLoading = false
                         )
                     }
+
                 }.onFailure { e ->
-                    _uiState.update { it.copy(isLoading = false, error = "Failed to load progress: ${e.message}") }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = "Failed to load progress: ${e.message}"
+                        )
+                    }
                 }
 
             }.onFailure { e ->
-                _uiState.update { it.copy(isLoading = false, error = "Failed to load habits: ${e.message}") }
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = "Failed to load habits: ${e.message}"
+                    )
+                }
             }
         }
     }

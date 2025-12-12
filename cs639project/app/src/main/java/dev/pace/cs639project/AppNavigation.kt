@@ -183,6 +183,7 @@ fun MomentumApp(
     ) {
         when (currentScreen) {
             is AppScreen.Home -> HomeScreen(
+                userId = userId, // ✅ ADD THIS
                 onOpenDrawer = { scope.launch { drawerState.open() } },
                 onOpenStreakTracker = { habitId ->
                     currentScreen = AppScreen.StreakTracker(habitId = habitId)
@@ -190,6 +191,7 @@ fun MomentumApp(
                 onOpenApi = { currentScreen = AppScreen.ApiSuggestions },
                 onOpenSettings = { currentScreen = AppScreen.Settings }
             )
+
 
             is AppScreen.StreakTracker -> StreakTrackerScreen(
                 habitId = (currentScreen as AppScreen.StreakTracker).habitId!!,
