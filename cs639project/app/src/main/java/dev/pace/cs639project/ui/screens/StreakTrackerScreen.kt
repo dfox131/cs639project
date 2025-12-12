@@ -24,6 +24,7 @@ import dev.pace.cs639project.viewmodel.FirestoreViewModel
 import dev.pace.cs639project.viewmodel.StreakTrackerViewModel
 import java.time.DayOfWeek
 import java.time.LocalDate
+
 @Composable fun StreakBadge(days: Int) { Text("Streak: $days Days") }
 @Composable fun WeeklyStreakTracker(weeklyCompletedDays: Set<DayOfWeek>, currentDay: Int) { Text("Weekly Tracker: ${weeklyCompletedDays.size} days") }
 @Composable fun StreakCalendar(completedDates: Set<LocalDate>) { Text("Calendar: ${completedDates.size} entries") }
@@ -38,8 +39,11 @@ fun StreakTrackerScreen(
     onNavigateBack: () -> Unit,
 ) {
 
-    // ✅ ViewModel now requires BOTH habitId + userId
+    // ✅ FIXED: Added 'key = habitId'.
+    // This tells Compose to create a NEW ViewModel instance whenever habitId changes,
+    // instead of reusing the old one.
     val viewModel: StreakTrackerViewModel = viewModel(
+        key = habitId,
         factory = StreakTrackerViewModel.Factory(
             habitId = habitId,
             userId = userId

@@ -7,7 +7,6 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -83,14 +82,10 @@ fun MomentumApp(
     isDarkTheme: Boolean,
     onThemeChanged: (Boolean) -> Unit
 ) {
-    // ⚠️ 之前这里有一行错误的 "fun MomentumApp(userId: String) {" 导致了语法错误，已删除
-
     var currentScreen by remember { mutableStateOf<AppScreen>(AppScreen.Home) }
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-
-    val defaultStreakHabitId = "DEFAULT_HABIT_ID_FOR_DRAWER"
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -113,16 +108,7 @@ fun MomentumApp(
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
 
-                NavigationDrawerItem(
-                    label = { Text("Streak Tracker") },
-                    selected = currentScreen is AppScreen.StreakTracker,
-                    onClick = {
-                        currentScreen = AppScreen.StreakTracker(habitId = defaultStreakHabitId)
-                        scope.launch { drawerState.close() }
-                    },
-                    icon = { Icon(Icons.Default.Star, contentDescription = null) },
-                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                )
+                // Users will access it via Home or "My Habits" list.
 
                 NavigationDrawerItem(
                     label = { Text("My Habits") },
@@ -183,7 +169,7 @@ fun MomentumApp(
     ) {
         when (currentScreen) {
             is AppScreen.Home -> HomeScreen(
-                userId = userId, // ✅ ADD THIS
+                userId = userId,
                 onOpenDrawer = { scope.launch { drawerState.open() } },
                 onOpenStreakTracker = { habitId ->
                     currentScreen = AppScreen.StreakTracker(habitId = habitId)
@@ -192,7 +178,7 @@ fun MomentumApp(
                 onOpenSettings = { currentScreen = AppScreen.Settings }
             )
 
-
+            // This screen is still reachable via code, just not from the drawer.
             is AppScreen.StreakTracker -> StreakTrackerScreen(
                 habitId = (currentScreen as AppScreen.StreakTracker).habitId!!,
                 userId = userId,
@@ -223,7 +209,6 @@ fun MomentumApp(
                 onThemeChanged = onThemeChanged
             )
 
-            // ⚠️ 修复了这里的参数传递：去掉了重复的 onBack，保留了 userId 和 isDarkTheme
             is AppScreen.Profile -> ProfileScreen(
                 onBack = { currentScreen = AppScreen.Home },
                 isDarkTheme = isDarkTheme,
