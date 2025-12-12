@@ -39,7 +39,10 @@ sealed class AppScreen {
 }
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(
+    isDarkTheme: Boolean,
+    onThemeChanged: (Boolean) -> Unit
+) {
     val authViewModel: AuthViewModel = viewModel()
     val currentUserId by authViewModel.currentUserId.collectAsState()
 
@@ -65,12 +68,23 @@ fun AppNavigation() {
     }
     else {
         // 🚀 User LOGGED IN → show full app with drawer navigation
-        MomentumApp(userId = currentUserId!!)
+        MomentumApp(
+            userId = currentUserId!!,
+            isDarkTheme = isDarkTheme,
+            onThemeChanged = onThemeChanged
+        )
     }
 }
 
 
 @Composable
+
+fun MomentumApp(
+    userId: String,
+    isDarkTheme: Boolean,
+    onThemeChanged: (Boolean) -> Unit
+) {
+
 fun MomentumApp(userId: String) {
 
     var currentScreen by remember { mutableStateOf<AppScreen>(AppScreen.Home) }
@@ -187,8 +201,6 @@ fun MomentumApp(userId: String) {
                 onNavigateBack = { currentScreen = AppScreen.Home }
             )
 
-
-
             is AppScreen.Habits -> HabitListScreen(
                 userId = userId,   // ⭐ this comes from MainActivity → MomentumApp
                 onBack = { currentScreen = AppScreen.Home },
@@ -196,13 +208,11 @@ fun MomentumApp(userId: String) {
                 onOpenStreakTracker = { habitId -> currentScreen = AppScreen.StreakTracker(habitId = habitId) }
             )
 
-
             is AppScreen.AddEditHabit -> AddHabitScreen(
                 userId = userId,
                 onBack = { currentScreen = AppScreen.Home },
                 onHabitSaved = { currentScreen = AppScreen.Habits }
             )
-
 
             is AppScreen.ApiSuggestions -> ApiSuggestionsScreen(
                 onBack = { currentScreen = AppScreen.Home }
@@ -210,10 +220,14 @@ fun MomentumApp(userId: String) {
 
             is AppScreen.Settings -> SettingsScreen(
                 onBack = { currentScreen = AppScreen.Home },
-                onProfileEdit = { currentScreen = AppScreen.Profile }
+                onProfileEdit = { currentScreen = AppScreen.Profile },
+                isDarkTheme = isDarkTheme,
+                onThemeChanged = onThemeChanged
             )
 
             is AppScreen.Profile -> ProfileScreen(
+                onBack = { currentScreen = AppScreen.Home },
+                isDarkTheme = isDarkTheme
                 userId = userId,
                 onBack = { currentScreen = AppScreen.Home }
             )

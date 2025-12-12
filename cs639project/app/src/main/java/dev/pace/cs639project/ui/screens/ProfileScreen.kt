@@ -33,8 +33,29 @@ private enum class UnitSystem { Metric, Imperial }
 fun ProfileScreen(
     userId: String,
     onBack: () -> Unit = {},
-    onNotificationClick: () -> Unit = {}
+    onNotificationClick: () -> Unit = {},
+    isDarkTheme: Boolean
 ) {
+    // local stat
+    var email by remember { mutableStateOf("alex@example.com") }   // string
+    var sex by remember { mutableStateOf("male") }                 // "male" / "female" / "other"（可选）
+    var heightCm by remember { mutableStateOf(175.0) }             // number
+    var weightKg by remember { mutableStateOf(70.0) }              // number
+    var unitSystem by remember { mutableStateOf(UnitSystem.Metric) }
+    var heightInput by remember { mutableStateOf("175") }
+    var weightInput by remember { mutableStateOf("70") }
+
+    val context = LocalContext.current
+
+    val screenBackgroundColor = if (isDarkTheme) Color(0xFF020617) else Color(0xFFF5F7FB)
+    val cardBackgroundColor = if (isDarkTheme) Color(0xFF111827) else Color.White
+    val primaryTextColor = if (isDarkTheme) Color.White else Color(0xFF111827)
+    val secondaryTextColor = if (isDarkTheme) Color(0xFF9CA3AF) else Color(0xFF6B7280)
+
+    val chipSelectedColor = if (isDarkTheme) Color(0xFF1E3A8A) else Color(0xFFDBEAFE)
+    val chipUnselectedColor = if (isDarkTheme) Color(0xFF374151) else Color(0xFFE5E7EB)
+
+    val editLinkColor = if (isDarkTheme) Color(0xFF60A5FA) else Color(0xFF2563EB)
     val viewModel: ProfileViewModel = viewModel(
         key = userId,  // ensures a unique VM per user
         factory = object : ViewModelProvider.Factory {
@@ -93,7 +114,7 @@ fun ProfileScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF5F7FB))
+                .background(screenBackgroundColor)
                 .padding(innerPadding)
         ) {
             LazyColumn(
@@ -137,13 +158,13 @@ fun ProfileScreen(
                             text = email,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
-                            color = Color(0xFF111827)
+                            color = primaryTextColor
                         )
 
                         Text(
                             text = "Mapped to Firestore collection: users",
                             fontSize = 12.sp,
-                            color = Color(0xFF6B7280),
+                            color = secondaryTextColor,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -152,13 +173,19 @@ fun ProfileScreen(
 
                 // email + gender
                 item {
-                    ProfileSectionCard(title = "Account") {
+                    ProfileSectionCard(title = "Account", backgroundColor = cardBackgroundColor, titleColor = primaryTextColor) {
                         OutlinedTextField(
                             value = email,
                             onValueChange = { email = it },
                             label = { Text("Email (matches Firebase Auth)") },
                             singleLine = true,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = primaryTextColor,
+                                unfocusedTextColor = primaryTextColor,
+                                focusedLabelColor = primaryTextColor,
+                                unfocusedLabelColor = secondaryTextColor
+                            )
                         )
 
                         Spacer(modifier = Modifier.height(12.dp))
@@ -167,7 +194,7 @@ fun ProfileScreen(
                             text = "Gender",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
-                            color = Color(0xFF111827)
+                            color = primaryTextColor
                         )
                         Spacer(modifier = Modifier.height(8.dp))
 
@@ -180,19 +207,28 @@ fun ProfileScreen(
                                 label = "Male",
                                 value = "male",
                                 selected = sex == "male",
-                                onSelected = { sex = "male" }
+                                onSelected = { sex = "male" },
+                                selectedColor = chipSelectedColor,
+                                unselectedColor = chipUnselectedColor,
+                                textColor = primaryTextColor
                             )
                             SexOptionChip(
                                 label = "Female",
                                 value = "female",
                                 selected = sex == "female",
-                                onSelected = { sex = "female" }
+                                onSelected = { sex = "female" },
+                                selectedColor = chipSelectedColor,
+                                unselectedColor = chipUnselectedColor,
+                                textColor = primaryTextColor
                             )
                             SexOptionChip(
                                 label = "Other",
                                 value = "other",
                                 selected = sex == "other",
-                                onSelected = { sex = "other" }
+                                onSelected = { sex = "other" },
+                                selectedColor = chipSelectedColor,
+                                unselectedColor = chipUnselectedColor,
+                                textColor = primaryTextColor
                             )
                         }
                     }
@@ -200,7 +236,7 @@ fun ProfileScreen(
 
                 // measurements
                 item {
-                    ProfileSectionCard(title = "Measurements") {
+                    ProfileSectionCard(title = "Measurements", backgroundColor = cardBackgroundColor, titleColor = primaryTextColor) {
 
                         // switch unit (label + chips 分两行，防止挤）
                         Column(
@@ -209,7 +245,7 @@ fun ProfileScreen(
                             Text(
                                 text = "Unit system:",
                                 fontSize = 14.sp,
-                                color = Color(0xFF111827)
+                                color = primaryTextColor
                             )
 
                             Spacer(modifier = Modifier.height(8.dp))
@@ -224,10 +260,10 @@ fun ProfileScreen(
                                         heightInput = formatNumber(heightCm)
                                         weightInput = formatNumber(weightKg)
                                     },
-                                    label = { Text("Metric") },
+                                    label = { Text("Metric", color = primaryTextColor) },
                                     colors = AssistChipDefaults.assistChipColors(
                                         containerColor = if (unitSystem == UnitSystem.Metric)
-                                            Color(0xFFDBEAFE) else Color(0xFFE5E7EB)
+                                            chipSelectedColor else chipUnselectedColor
                                     )
                                 )
 
@@ -237,10 +273,10 @@ fun ProfileScreen(
                                         heightInput = formatNumber(heightCm / 2.54)
                                         weightInput = formatNumber(weightKg * 2.20462)
                                     },
-                                    label = { Text("Imperial") },
+                                    label = { Text("Imperial", color = primaryTextColor) },
                                     colors = AssistChipDefaults.assistChipColors(
                                         containerColor = if (unitSystem == UnitSystem.Imperial)
-                                            Color(0xFFDBEAFE) else Color(0xFFE5E7EB)
+                                            chipSelectedColor else chipUnselectedColor
                                     )
                                 )
                             }
@@ -274,7 +310,13 @@ fun ProfileScreen(
                                 },
                                 label = { Text(heightLabel) },
                                 singleLine = true,
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedTextColor = primaryTextColor,
+                                    unfocusedTextColor = primaryTextColor,
+                                    focusedLabelColor = primaryTextColor,
+                                    unfocusedLabelColor = secondaryTextColor
+                                )
                             )
 
                             OutlinedTextField(
@@ -293,7 +335,13 @@ fun ProfileScreen(
                                 },
                                 label = { Text(weightLabel) },
                                 singleLine = true,
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedTextColor = primaryTextColor,
+                                    unfocusedTextColor = primaryTextColor,
+                                    focusedLabelColor = primaryTextColor,
+                                    unfocusedLabelColor = secondaryTextColor
+                                )
                             )
                         }
 
@@ -302,7 +350,7 @@ fun ProfileScreen(
                         Text(
                             text = "Height: cm or inches.  Weight: kg or lbs.",
                             fontSize = 12.sp,
-                            color = Color(0xFF6B7280)
+                            color = secondaryTextColor
                         )
                     }
 
@@ -349,13 +397,16 @@ private fun SexOptionChip(
     label: String,
     value: String,
     selected: Boolean,
-    onSelected: () -> Unit
+    onSelected: () -> Unit,
+    selectedColor: Color,
+    unselectedColor: Color,
+    textColor: Color
 ) {
     AssistChip(
         onClick = onSelected,
-        label = { Text(label) },
+        label = { Text(label, color = textColor) },
         colors = AssistChipDefaults.assistChipColors(
-            containerColor = if (selected) Color(0xFFDBEAFE) else Color(0xFFE5E7EB)
+            containerColor = if (selected) selectedColor else unselectedColor
         )
     )
 }
@@ -363,11 +414,13 @@ private fun SexOptionChip(
 @Composable
 private fun ProfileSectionCard(
     title: String,
+    backgroundColor: Color,
+    titleColor: Color,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Surface(
         shape = RoundedCornerShape(24.dp),
-        color = Color.White,
+        color = backgroundColor,
         tonalElevation = 1.dp,
         shadowElevation = 2.dp,
         modifier = Modifier.fillMaxWidth()
@@ -381,7 +434,7 @@ private fun ProfileSectionCard(
                 text = title,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color(0xFF111827)
+                color = titleColor
             )
             Spacer(modifier = Modifier.height(8.dp))
             content()
