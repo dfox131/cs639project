@@ -15,8 +15,9 @@ Fitness Habit Builder is designed to help users establish and maintain healthy r
 With features like streak tracking, dark mode support, and intelligent workout suggestions powered by external APIs, Fitness Habit Builder keeps you motivated and accountable.
 
 
-## Install App
-[ Download Fitness Habit Builder (APK)](#) *(add link)*
+## 📲 Install App
+
+[Download Fitness Habit Builder (APK)](apk/FitnessHabitBuilder.apk)
 
 ## Idea Proposal
 We provided one concept for the app in this proposal.  
