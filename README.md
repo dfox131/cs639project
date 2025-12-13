@@ -97,7 +97,7 @@ You can view the full UI/UX design and Database schema of this app:
 
 ## 🎥 Demo Video
 
-[![Watch the Demo](https://img.youtube.com/vi/oinarLtv5JQ/hqdefault.jpg)](https://youtube.com/shorts/oinarLtv5JQ)
+[![Watch the Demo](https://img.youtube.com/vi/WopNPM12W1M/hqdefault.jpg)](https://youtube.com/shorts/WopNPM12W1M)
 
 ## GitHub Insights
 <img src="" width="800" alt="GitHub Insights" />
