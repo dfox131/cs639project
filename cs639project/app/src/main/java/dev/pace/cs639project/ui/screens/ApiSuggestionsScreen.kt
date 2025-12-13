@@ -135,52 +135,50 @@ fun ExerciseSuggestionCard(
         color = Color(0xFFFBD7B3),
         tonalElevation = 2.dp,
         shadowElevation = 4.dp,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(150.dp)
+        modifier = Modifier.fillMaxWidth()
+        // ✅ remove fixed height so the card can grow if text wraps
+        // .height(150.dp)
     ) {
-        Box(
+        Row(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 20.dp, vertical = 16.dp)
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.align(Alignment.TopStart)
+            // icon
+            Box(
+                modifier = Modifier
+                    .size(56.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFF87CEEB)),
+                contentAlignment = Alignment.Center
             ) {
-                // icon
-                Box(
-                    modifier = Modifier
-                        .size(56.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF87CEEB)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = suggestion.icon,
-                        fontSize = 26.sp
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Column {
-                    Text(
-                        text = suggestion.name,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF111827)
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = suggestion.description,
-                        fontSize = 14.sp,
-                        color = Color(0xFF4B5563)
-                    )
-                }
+                Text(text = suggestion.icon, fontSize = 26.sp)
             }
 
-            // button TRY
+            Spacer(modifier = Modifier.width(16.dp))
+
+            // ✅ text takes remaining space, but never overlaps button
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 12.dp)
+            ) {
+                Text(
+                    text = suggestion.name,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF111827)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = suggestion.description,
+                    fontSize = 14.sp,
+                    color = Color(0xFF4B5563)
+                )
+            }
+
+            // ✅ button is its own column space
             Button(
                 onClick = onTryClick,
                 colors = ButtonDefaults.buttonColors(
@@ -188,9 +186,7 @@ fun ExerciseSuggestionCard(
                     contentColor = Color(0xFF111827)
                 ),
                 shape = RoundedCornerShape(20.dp),
-                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 6.dp),
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
+                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 6.dp)
             ) {
                 Text(
                     text = "Try",
