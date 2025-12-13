@@ -23,47 +23,27 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.platform.LocalContext
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.health.connect.client.permission.HealthPermission
-import androidx.health.connect.client.records.StepsRecord
 import dev.pace.cs639project.ui.components.DailyProgressPieChart
 import dev.pace.cs639project.viewmodel.HomeViewModel
-import dev.pace.cs639project.viewmodel.HealthViewModel
 
-val STEPS_READ_PERMISSIONS: Set<String> = setOf(
-    HealthPermission.getReadPermission(StepsRecord::class)
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     userId: String,
     viewModel: HomeViewModel = viewModel(),
-    healthViewModel: HealthViewModel = viewModel(
-        factory = HealthViewModel.Factory(LocalContext.current.applicationContext)
-    ),
     onOpenDrawer: () -> Unit,
     onOpenStreakTracker: (habitId: String) -> Unit,
     onOpenApi: () -> Unit,
     onOpenSettings: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val healthState by healthViewModel.uiState.collectAsState()
 
     // ✅ REQUIRED: load data for authenticated user
     LaunchedEffect(userId) {
         viewModel.loadDailyData(userId)
     }
 
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = { healthViewModel.permissionsRequestCompleted() }
-    )
-
-    LaunchedEffect(healthState.permissionsRequired) {
-        if (healthState.permissionsRequired) {
-            permissionLauncher.launch(STEPS_READ_PERMISSIONS.toTypedArray())
-        }
-    }
 
     Scaffold(
         topBar = {
@@ -89,7 +69,7 @@ fun HomeScreen(
                 .padding(innerPadding)
         ) {
             when {
-                uiState.isLoading || healthState.isLoading -> {
+                uiState.isLoading -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
                     }
@@ -126,18 +106,10 @@ fun HomeScreen(
 
                                 Spacer(Modifier.height(8.dp))
 
-                                if (healthState.permissionsGranted) {
-                                    Text(
-                                        text = "Steps Today: ${healthState.stepsToday}",
-                                        fontSize = 16.sp
-                                    )
-                                } else if (healthState.permissionsRequired) {
-                                    PermissionPromptCard {
-                                        permissionLauncher.launch(
-                                            STEPS_READ_PERMISSIONS.toTypedArray()
-                                        )
-                                    }
-                                }
+
+
+
+
                             }
                         }
 

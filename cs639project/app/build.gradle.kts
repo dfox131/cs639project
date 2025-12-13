@@ -54,7 +54,6 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)
-    implementation("androidx.health.connect:connect-client:1.1.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation(libs.androidx.foundation)
