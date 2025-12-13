@@ -20,41 +20,60 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun StreakBadge(days: Int) {
-   Card(
-       modifier = Modifier
-           .fillMaxWidth()
-           .height(100.dp)
-           .padding(horizontal = 8.dp),
-       shape = RoundedCornerShape(16.dp),
-       colors = CardDefaults.cardColors(
-           containerColor = Color(0xFFE6F3FF)
-       ),
-       elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-   ) {
-       Column(
-           modifier = Modifier.fillMaxSize(),
-           horizontalAlignment = Alignment.CenterHorizontally,
-           verticalArrangement = Arrangement.Center
-       ) {
-           Text(
-               text = "$days",
-               style = MaterialTheme.typography.displaySmall.copy(
-                   fontWeight = FontWeight.ExtraBold,
-                   color = Color(0xFF007AFF)
-               )
-           )
-           Text(
-               text = "DAYS STREAK",
-               style = MaterialTheme.typography.titleMedium.copy(
-                   fontWeight = FontWeight.SemiBold,
-                   color = Color.Black.copy(alpha = 0.8f)
-               )
-           )
-           Text(
-               text = "You're Doing Great!",
-               style = MaterialTheme.typography.bodySmall,
-               color = Color.Gray
-           )
-       }
-   }
+
+    // ---------------------------------------------------------------------
+    // 🔥 NEW: Dynamic Message Logic
+    // ---------------------------------------------------------------------
+    val motivationalComment = when (days) {
+        0 -> "Start today, build momentum!"
+        in 1..2 -> "You've begun the journey!"
+        in 3..6 -> "Consistency is key! Keep going."
+        in 7..13 -> "One week strong! You've formed a micro-habit."
+        in 14..29 -> "Two weeks plus! This is becoming routine."
+        in 30..89 -> "A full month! This habit is part of you."
+        in 90..179 -> "Three months of dedication! True commitment."
+        in 180..364 -> "Half a year! Unstoppable force."
+        in 365..Int.MAX_VALUE -> "A full year! Legend status achieved! 🎉"
+        else -> "You're Doing Great!"
+    }
+    // ---------------------------------------------------------------------
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp)
+            .padding(horizontal = 8.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFE6F3FF)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "$days",
+                style = MaterialTheme.typography.displaySmall.copy(
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color(0xFF007AFF)
+                )
+            )
+            Text(
+                text = "DAYS STREAK",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Black.copy(alpha = 0.8f)
+                )
+            )
+            // Use the dynamic comment here
+            Text(
+                text = motivationalComment,
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Gray
+            )
+        }
+    }
 }
