@@ -8,7 +8,6 @@ data class ExerciseSuggestion(
     val icon: String
 )
 
-// Replaced with actual, effective exercise suggestions
 val exerciseSuggestions = listOf(
     ExerciseSuggestion(
         name = "Bodyweight Squats",

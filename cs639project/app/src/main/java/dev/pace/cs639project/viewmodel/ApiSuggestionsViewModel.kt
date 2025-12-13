@@ -12,14 +12,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import android.util.Log // Use Android logging
 
-// --- UI State for API Screen ---
 data class ApiSuggestionsUiState(
     val suggestions: List<ExerciseSuggestion> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null
 )
 
-// --- ViewModel ---
 class ApiSuggestionsViewModel(
     private val firestoreRepository: FirestoreRepository = FirestoreRepository()
 ) : ViewModel() {
@@ -32,33 +30,27 @@ class ApiSuggestionsViewModel(
     }
 
     private fun fetchSuggestions() {
-        // In a real app, this would call an API repository (e.g., using Retrofit).
-        // For now, use the local list of real exercises.
+
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            // Simulate network delay
             kotlinx.coroutines.delay(500)
 
             _uiState.update {
                 it.copy(
-                    suggestions = exerciseSuggestions, // Use the real data list
+                    suggestions = exerciseSuggestions,
                     isLoading = false
                 )
             }
         }
     }
 
-    /**
-     * 🔥 FIX: Saves the selected exercise suggestion as a new habit in Firestore.
-     */
     fun addHabitFromSuggestion(userId: String, suggestion: ExerciseSuggestion) {
         viewModelScope.launch {
-            // Default parameters for exercise habits
             val result = firestoreRepository.createHabit(
                 userId = userId,
                 name = suggestion.name,
                 type = "exercise",
-                goal = 1, // Default goal: 1 completion per day
+                goal = 1,
                 reminderTime = null
             )
 

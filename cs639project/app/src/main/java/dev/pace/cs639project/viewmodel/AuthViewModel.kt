@@ -22,10 +22,6 @@ class AuthViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-
-
-    /** ---------------------- SIGNUP ----------------------- **/
-
     fun signup(
         email: String,
         password: String,
@@ -52,7 +48,6 @@ class AuthViewModel : ViewModel() {
                 )
 
                 _currentUserId.value = uid
-                // _justSignedUp.value = true
                 _isLoading.value = false
 
                 onSuccess()
@@ -63,8 +58,6 @@ class AuthViewModel : ViewModel() {
             }
         }
     }
-
-    /** ---------------------- LOGIN ----------------------- **/
 
     fun login(email: String, password: String, onSuccess: () -> Unit) {
         _isLoading.value = true
@@ -86,15 +79,10 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    /** ---------------------- LOGOUT ----------------------- **/
-
     fun logout() {
         auth.signOut()
         _currentUserId.value = null
-        // _logoutSuccess.value = true
     }
-
-    /** ---------------------- UI Helpers ----------------------- **/
 
     fun clearError() {
         _error.value = null

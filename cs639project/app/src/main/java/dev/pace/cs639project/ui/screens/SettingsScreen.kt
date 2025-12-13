@@ -34,7 +34,6 @@ fun SettingsScreen(
     isDarkTheme: Boolean,
     onThemeChanged: (Boolean) -> Unit
 ) {
-    // local stat
     var dailyReminderOn by remember { mutableStateOf(true) }
     var notificationTime by remember { mutableStateOf("7:00 AM") }
     var showTimeDialog by remember { mutableStateOf(false) }
@@ -42,7 +41,6 @@ fun SettingsScreen(
 
     val authViewModel: AuthViewModel = viewModel()
 
-    // theme color
     val backgroundColor = if (isDarkTheme) Color(0xFF020617) else Color(0xFFF5F7FB)
     val cardColor = if (isDarkTheme) Color(0xFF111827) else Color.White
     val borderColor = if (isDarkTheme) Color(0xFF374151) else Color(0xFFEEEEEE)
@@ -84,7 +82,6 @@ fun SettingsScreen(
                     .padding(horizontal = 16.dp, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // daily Reminder
                 item {
                     SettingsCard(cardColor = cardColor, borderColor = borderColor) {
                         Row(
@@ -106,7 +103,6 @@ fun SettingsScreen(
                     }
                 }
 
-                // notification Time
                 item {
                     SettingsCard(cardColor = cardColor, borderColor = borderColor) {
                         Row(
@@ -129,7 +125,6 @@ fun SettingsScreen(
                                         else -> hour12
                                     }
 
-                                    // time selector
                                     TimePickerDialog(
                                         context,
                                         { _, selectedHour, selectedMinute ->
@@ -171,7 +166,6 @@ fun SettingsScreen(
                 }
 
 
-                //  profile
                 item {
                     SettingsCard(cardColor = cardColor, borderColor = borderColor) {
                         Row(
@@ -198,7 +192,6 @@ fun SettingsScreen(
                     }
                 }
 
-                //  theme ,version
                 item {
                     SettingsCard(cardColor = cardColor, borderColor = borderColor) {
                         Row(
@@ -228,7 +221,6 @@ fun SettingsScreen(
                     }
                 }
 
-                //  about
                 item {
                     SettingsCard(cardColor = cardColor, borderColor = borderColor) {
                         Column(
@@ -272,7 +264,6 @@ fun SettingsScreen(
     }
 }
 
-// style
 @Composable
 fun SettingsCard(
     cardColor: Color,

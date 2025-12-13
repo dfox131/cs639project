@@ -39,7 +39,6 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    // ✅ REQUIRED: load data for authenticated user
     LaunchedEffect(userId) {
         viewModel.loadDailyData(userId)
     }
@@ -162,7 +161,6 @@ fun HomeScreen(
     }
 }
 
-/* ---------------- Supporting composables ---------------- */
 
 @Composable
 fun PermissionPromptCard(onClick: () -> Unit) {

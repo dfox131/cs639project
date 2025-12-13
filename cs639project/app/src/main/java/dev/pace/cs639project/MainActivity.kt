@@ -13,7 +13,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // automatically logs user out when reloading the app
         FirebaseAuth.getInstance().signOut()
 
         setContent {
@@ -21,7 +20,6 @@ class MainActivity : ComponentActivity() {
             var isDarkTheme by remember { mutableStateOf(systemDark) }
 
             Cs639projectTheme(darkTheme = isDarkTheme) {
-                // 🔥 AppNavigation now handles login/signup + MomentumApp
                 AppNavigation(
                     isDarkTheme = isDarkTheme,
                     onThemeChanged = { isDarkTheme = it }

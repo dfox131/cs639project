@@ -34,13 +34,11 @@ fun ApiSuggestionsScreen(
     onBack: () -> Unit = {},
     onNotificationClick: () -> Unit = {},
     viewModel: ApiSuggestionsViewModel = viewModel(),
-    authViewModel: AuthViewModel = viewModel() // Use existing AuthViewModel
+    authViewModel: AuthViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
-    val currentUserId by authViewModel.currentUserId.collectAsState() // Get the current user ID
-
-    // ❌ REMOVED: Illegal Firestore initialization code here.
+    val currentUserId by authViewModel.currentUserId.collectAsState()
 
     Scaffold(
         topBar = {
@@ -136,8 +134,6 @@ fun ExerciseSuggestionCard(
         tonalElevation = 2.dp,
         shadowElevation = 4.dp,
         modifier = Modifier.fillMaxWidth()
-        // ✅ remove fixed height so the card can grow if text wraps
-        // .height(150.dp)
     ) {
         Row(
             modifier = Modifier
@@ -145,7 +141,6 @@ fun ExerciseSuggestionCard(
                 .padding(horizontal = 20.dp, vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // icon
             Box(
                 modifier = Modifier
                     .size(56.dp)
@@ -158,7 +153,6 @@ fun ExerciseSuggestionCard(
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            // ✅ text takes remaining space, but never overlaps button
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -178,7 +172,6 @@ fun ExerciseSuggestionCard(
                 )
             }
 
-            // ✅ button is its own column space
             Button(
                 onClick = onTryClick,
                 colors = ButtonDefaults.buttonColors(

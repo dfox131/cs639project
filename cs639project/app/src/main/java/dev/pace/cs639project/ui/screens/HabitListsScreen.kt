@@ -25,7 +25,6 @@ fun HabitListScreen(
     onAddHabit: () -> Unit,
     onOpenStreakTracker: (habitId: String) -> Unit
 ) {
-    // Fire whenever userId changes (first login, or switching accounts)
     LaunchedEffect(userId) {
         viewModel.initAuth()
         viewModel.loadHabits(userId)
@@ -115,7 +114,6 @@ fun HabitCard(
                     style = MaterialTheme.typography.titleMedium
                 )
 
-                //Show a checkmark if done
                 if (isCompleted) {
                     Text("✅", style = MaterialTheme.typography.titleMedium)
                 }
@@ -147,7 +145,6 @@ fun HabitCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
 
-                // VIEW STREAK BUTTON
                 Button(
                     onClick = { onCardClick(habit.habitId) },
                     colors = ButtonDefaults.buttonColors(
@@ -157,7 +154,6 @@ fun HabitCard(
                     Text(text = "View Streak")
                 }
 
-                // MARK COMPLETED BUTTON
                 if (isCompleted) {
                     Button(
                         onClick = { /* Do nothing, already done */ },

@@ -21,9 +21,6 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun StreakBadge(days: Int) {
 
-    // ---------------------------------------------------------------------
-    // 🔥 NEW: Dynamic Message Logic
-    // ---------------------------------------------------------------------
     val motivationalComment = when (days) {
         0 -> "Start today, build momentum!"
         in 1..2 -> "You've begun the journey!"
@@ -36,7 +33,6 @@ fun StreakBadge(days: Int) {
         in 365..Int.MAX_VALUE -> "A full year! Legend status achieved! 🎉"
         else -> "You're Doing Great!"
     }
-    // ---------------------------------------------------------------------
 
     Card(
         modifier = Modifier
@@ -68,7 +64,6 @@ fun StreakBadge(days: Int) {
                     color = Color.Black.copy(alpha = 0.8f)
                 )
             )
-            // Use the dynamic comment here
             Text(
                 text = motivationalComment,
                 style = MaterialTheme.typography.bodySmall,

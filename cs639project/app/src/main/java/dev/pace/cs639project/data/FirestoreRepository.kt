@@ -176,8 +176,8 @@ class FirestoreRepository {
     suspend fun markHabitCompleted(
         userId: String,
         habitId: String,
-        date: String,        // YYYY-MM-DD
-        value: Int? = null   // optional (ex: steps)
+        date: String,
+        value: Int? = null
     ): Result<Unit> {
         return try {
             val progressData = hashMapOf(

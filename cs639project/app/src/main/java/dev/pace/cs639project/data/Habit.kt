@@ -1,7 +1,7 @@
 package dev.pace.cs639project.data
 
 data class Habit(
-    val habitId: String = "",      // Firestore document ID (set after fetch)
+    val habitId: String = "",
     val userId: String = "",
     val name: String = "",
     val type: String = "custom",

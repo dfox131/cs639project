@@ -36,9 +36,7 @@ fun ProfileScreen(
     onBack: () -> Unit = {},
     onNotificationClick: () -> Unit = {}
 ) {
-    // ------------------------------
-    // ViewModel (RESTORED)
-    // ------------------------------
+
     val viewModel: ProfileViewModel = viewModel(
         key = "profile-$userId",
         factory = object : ViewModelProvider.Factory {
@@ -50,24 +48,17 @@ fun ProfileScreen(
 
     val uiState by viewModel.uiState.collectAsState()
 
-    // ------------------------------
-    // UI State mapped to ViewModel values
-    // ------------------------------
     var email by remember(uiState.email) { mutableStateOf(uiState.email) }
     var sex by remember(uiState.sex) { mutableStateOf(uiState.sex ?: "") }
     var heightInput by remember(uiState.height) { mutableStateOf(uiState.height?.toString() ?: "") }
     var weightInput by remember(uiState.weight) { mutableStateOf(uiState.weight?.toString() ?: "") }
 
-    // For unit conversion
     var unitSystem by remember { mutableStateOf(UnitSystem.Metric) }
     var heightCm by remember(uiState.height) { mutableStateOf((uiState.height ?: 0).toDouble()) }
     var weightKg by remember(uiState.weight) { mutableStateOf((uiState.weight ?: 0).toDouble()) }
 
     val context = LocalContext.current
 
-    // ------------------------------
-    // DARK MODE COLORS (preserved from teammate)
-    // ------------------------------
     val bgColor = if (isDarkTheme) Color(0xFF020617) else Color(0xFFF5F7FB)
     val cardColor = if (isDarkTheme) Color(0xFF111827) else Color.White
     val textColor = if (isDarkTheme) Color.White else Color(0xFF111827)
@@ -93,7 +84,6 @@ fun ProfileScreen(
         }
     ) { innerPadding ->
 
-        // Loading State
         if (uiState.isLoading) {
             Box(
                 Modifier
@@ -115,9 +105,6 @@ fun ProfileScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            // ------------------------------
-            // Image + Email Display
-            // ------------------------------
             item {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -144,19 +131,9 @@ fun ProfileScreen(
                     Spacer(Modifier.height(12.dp))
 
                     Text(email, fontSize = 16.sp, fontWeight = FontWeight.Medium, color = textColor)
-
-                    //Text(
-                       // "Mapped to Firestore collection: users",
-                       // fontSize = 12.sp,
-                        //color = subTextColor,
-                       // textAlign = TextAlign.Center
-                   // )
                 }
             }
 
-            // ------------------------------
-            // ACCOUNT SECTION
-            // ------------------------------
             item {
                 ProfileSectionCard("Account", cardColor, textColor) {
 
@@ -190,9 +167,6 @@ fun ProfileScreen(
                 }
             }
 
-            // ------------------------------
-            // MEASUREMENTS SECTION
-            // ------------------------------
             item {
                 ProfileSectionCard("Measurements", cardColor, textColor) {
 
@@ -231,7 +205,6 @@ fun ProfileScreen(
 
                     Spacer(Modifier.height(12.dp))
 
-                    // Height + Weight Fields
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
 
                         OutlinedTextField(
@@ -275,9 +248,6 @@ fun ProfileScreen(
                 }
             }
 
-            // ------------------------------
-            // SAVE BUTTON
-            // ------------------------------
             item {
                 Button(
                     onClick = {

@@ -16,12 +16,10 @@ import dev.pace.cs639project.viewmodel.FirestoreViewModel
 fun FirestoreTestScreen(
     viewModel: FirestoreViewModel = viewModel()
 ) {
-    // Hardcoded test user until Firebase Auth is added
     val testUserId = "TEST_USER_123"
 
     var habitName by remember { mutableStateOf("") }
 
-    // Observe state from ViewModel
     val habits by viewModel.habits.collectAsState()
 
     Column(
@@ -63,7 +61,7 @@ fun FirestoreTestScreen(
                             reminderTime = null
                         ),
                         onDone = {
-                            habitName = ""   // clear field
+                            habitName = ""
                         }
                     )
                 }

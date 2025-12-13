@@ -42,7 +42,7 @@ fun AddHabitScreen(
     var name by remember { mutableStateOf("") }
     var type by remember { mutableStateOf("custom") }
     var goalText by remember { mutableStateOf("") }
-    var reminderTime by remember { mutableStateOf("") }   // "HH:mm", e.g. "08:00"
+    var reminderTime by remember { mutableStateOf("") }
     var showTimePicker by remember { mutableStateOf(false) }
 
     var isSaving by remember { mutableStateOf(false) }
@@ -133,8 +133,6 @@ fun AddHabitScreen(
                 )
             }
 
-
-            // GOAL (optional number)
             OutlinedTextField(
                 value = goalText,
                 onValueChange = {
@@ -149,7 +147,6 @@ fun AddHabitScreen(
                 )
             )
 
-            // REMINDER TIME (Native Picker - FIXED)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -201,7 +198,7 @@ fun AddHabitScreen(
                     label = { Text("Reminder time") },
                     modifier = Modifier.fillMaxWidth(),
                     readOnly = true,
-                    enabled = false, // still disabled for click handling
+                    enabled = false,
                     trailingIcon = {
                         Icon(Icons.Default.Notifications, contentDescription = null)
                     },

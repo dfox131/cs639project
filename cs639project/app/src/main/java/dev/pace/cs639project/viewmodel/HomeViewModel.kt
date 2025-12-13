@@ -29,24 +29,18 @@ class HomeViewModel(
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
-    private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE // YYYY-MM-DD
+    private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
 
-    /**
-     * Explicitly load all data for the given user.
-     * This must be called by the screen (HomeScreen).
-     */
     fun loadDailyData(userId: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
 
             val todayDate = LocalDate.now().format(dateFormatter)
 
-            // 1️⃣ Fetch all habits for the user
             val habitsResult = repo.getUserHabits(userId)
 
             habitsResult.onSuccess { habits ->
 
-                // 2️⃣ Fetch today's progress for the same user
                 val progressResult = repo.getTodayProgress(userId, todayDate)
 
                 progressResult.onSuccess { progressList ->

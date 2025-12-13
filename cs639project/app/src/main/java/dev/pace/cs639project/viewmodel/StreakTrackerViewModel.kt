@@ -13,7 +13,6 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-// --- UI State ---
 data class StreakTrackerUiState(
     val habitName: String? = "Streak Tracker",
     val currentStreak: Int = 0,
@@ -23,7 +22,6 @@ data class StreakTrackerUiState(
     val error: String? = null
 )
 
-// --- ViewModel ---
 class StreakTrackerViewModel(
     private val habitId: String,
     private val userId: String,
@@ -33,21 +31,16 @@ class StreakTrackerViewModel(
     private val _uiState = MutableStateFlow(StreakTrackerUiState())
     val uiState: StateFlow<StreakTrackerUiState> = _uiState.asStateFlow()
 
-    private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE // YYYY-MM-DD
+    private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE
 
     init {
-        // as soon as the VM is created (with a real userId), load data
         loadHabitAndProgress()
     }
 
-    /**
-     * Loads the habit details and its entire progress history.
-     */
     private fun loadHabitAndProgress() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            // --- 1. Load Habits for this user ---
             val habitResult = repo.getUserHabits(userId)
 
             habitResult.onSuccess { habitsList ->
@@ -69,7 +62,6 @@ class StreakTrackerViewModel(
                 return@launch
             }
 
-            // --- 2. Load Progress for this user + habit ---
             val progressResult = repo.getHabitProgressHistory(userId, habitId)
 
             progressResult.onSuccess { history ->
@@ -112,20 +104,13 @@ class StreakTrackerViewModel(
     }
 
     fun reload() {
-        // Ensures that the UI correctly reacts to the completion event by re-fetching data.
         loadHabitAndProgress()
     }
 
-    /**
-     * Calculates the longest consecutive streak ending yesterday or today.
-     * * FIX: Simplified logic for robust checking.
-     */
     private fun calculateCurrentStreak(completedDates: Set<LocalDate>): Int {
         var streak = 0
         var checkDate = LocalDate.now()
 
-        // If today is completed, start checking from today.
-        // If today is NOT completed, start checking from yesterday.
         if (!completedDates.contains(checkDate)) {
             checkDate = checkDate.minusDays(1)
         }
@@ -138,16 +123,12 @@ class StreakTrackerViewModel(
         return streak
     }
 
-    /**
-     * Determines which days of the week have completions in the last 7 days.
-     */
     private fun calculateWeeklyCompletion(completedDates: Set<LocalDate>): Set<DayOfWeek> {
         val completedDays = mutableSetOf<DayOfWeek>()
         val today = LocalDate.now()
-        val lastWeekStart = today.minusDays(6) // Check 7 days total (today and previous 6)
+        val lastWeekStart = today.minusDays(6)
 
         completedDates.forEach { date ->
-            // Check if the date is within the last 7 days, including today
             if (!date.isBefore(lastWeekStart) && !date.isAfter(today)) {
                 completedDays.add(date.dayOfWeek)
             }
@@ -168,4 +149,3 @@ class StreakTrackerViewModel(
             }
     }
 }
-// Note: The FirestoreRepository code remains unchanged as it is structurally sound.

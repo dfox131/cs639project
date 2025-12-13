@@ -33,7 +33,6 @@ fun SignupScreen(
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
-    // New fields
     val sexOptions = listOf("Male", "Female", "Other")
     var selectedSex by remember { mutableStateOf<String?>(null) }
     var expanded by remember { mutableStateOf(false) }
@@ -46,12 +45,10 @@ fun SignupScreen(
 
     val context = LocalContext.current
 
-    // 🔹 ROOT BOX
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
 
-        // 🔹 MAIN CONTENT
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -67,7 +64,6 @@ fun SignupScreen(
 
             Spacer(Modifier.height(20.dp))
 
-            // Email
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
@@ -76,7 +72,6 @@ fun SignupScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Password (masked)
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
@@ -103,7 +98,6 @@ fun SignupScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // Sex dropdown
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded }
@@ -136,7 +130,6 @@ fun SignupScreen(
 
             Spacer(Modifier.height(12.dp))
 
-            // Height
             OutlinedTextField(
                 value = height,
                 onValueChange = { height = it },
@@ -146,7 +139,6 @@ fun SignupScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
 
-            // Weight
             OutlinedTextField(
                 value = weight,
                 onValueChange = { weight = it },
@@ -167,7 +159,6 @@ fun SignupScreen(
                         height = height.toIntOrNull(),
                         weight = weight.toIntOrNull(),
                         onSuccess = {
-                            // 🔥 这里改了：显示 Toast，然后执行跳转逻辑
                             Toast.makeText(context, "Account created successfully 🎉", Toast.LENGTH_SHORT).show()
                             onSignupSuccess()
                         }

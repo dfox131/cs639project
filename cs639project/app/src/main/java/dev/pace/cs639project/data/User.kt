@@ -7,6 +7,6 @@ data class User(
     val sex: String? = null,
     val height: Int? = null,
     val weight: Int? = null,
-    val createdAt: Timestamp? = null,   // ⬅️ changed from Long? to Timestamp?
+    val createdAt: Timestamp? = null,
     val badges: List<String> = emptyList()
 )

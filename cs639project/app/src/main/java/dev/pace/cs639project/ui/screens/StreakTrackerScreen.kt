@@ -29,19 +29,15 @@ import java.time.LocalDate
 @Composable fun WeeklyStreakTracker(weeklyCompletedDays: Set<DayOfWeek>, currentDay: Int) { Text("Weekly Tracker: ${weeklyCompletedDays.size} days") }
 @Composable fun StreakCalendar(completedDates: Set<LocalDate>) { Text("Calendar: ${completedDates.size} entries") }
 
-// --------------------------------------------------------------------------
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StreakTrackerScreen(
     habitId: String,
-    userId: String,                // ✅ NEW: passed directly from navigation
+    userId: String,
     onNavigateBack: () -> Unit,
 ) {
 
-    // ✅ FIXED: Added 'key = habitId'.
-    // This tells Compose to create a NEW ViewModel instance whenever habitId changes,
-    // instead of reusing the old one.
     val viewModel: StreakTrackerViewModel = viewModel(
         key = habitId,
         factory = StreakTrackerViewModel.Factory(

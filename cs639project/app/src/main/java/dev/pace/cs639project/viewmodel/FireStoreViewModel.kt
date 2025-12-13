@@ -20,9 +20,6 @@ class FirestoreViewModel(
 
     private val authRepo = AuthRepository()
 
-    // ----------------------------
-    // AUTH STATE
-    // ----------------------------
     private val _userId = MutableStateFlow<String?>(null)
     val userId: StateFlow<String?> = _userId.asStateFlow()
 
@@ -47,9 +44,7 @@ class FirestoreViewModel(
         }
     }
 
-    // ----------------------------
-    // HABIT STATE
-    // ----------------------------
+
     private val _habits = MutableStateFlow<List<Habit>>(emptyList())
     val habits = _habits.asStateFlow()
 
@@ -57,18 +52,14 @@ class FirestoreViewModel(
     private val _completedHabitIds = MutableStateFlow<Set<String>>(emptySet())
     val completedHabitIds = _completedHabitIds.asStateFlow()
 
-    // ----------------------------
-    // LOAD HABITS & PROGRESS
-    // ----------------------------
+
     fun loadHabits(userId: String) {
         viewModelScope.launch {
-            //  Load Habits List
             val result = repo.getUserHabits(userId)
             result.onSuccess { habitsList ->
                 _habits.value = habitsList
             }
 
-            // Load Today's Progress to update checkboxes/buttons
             val today = LocalDate.now().toString()
             val progressResult = repo.getTodayProgress(userId, today)
             progressResult.onSuccess { list ->
@@ -79,9 +70,6 @@ class FirestoreViewModel(
     }
 
 
-    // ----------------------------
-    // ADD HABIT
-    // ----------------------------
     fun addHabit(
         userId: String,
         habit: Habit,
@@ -97,15 +85,12 @@ class FirestoreViewModel(
             )
 
             result.onSuccess {
-                loadHabits(userId) // reload list
+                loadHabits(userId)
                 onDone()
             }
         }
     }
 
-    // ----------------------------
-    // MARK HABIT COMPLETED
-    // ----------------------------
     fun markHabitCompleted(userId: String, habitId: String, value: Int? = null) {
         viewModelScope.launch {
             val today = LocalDate.now().toString()

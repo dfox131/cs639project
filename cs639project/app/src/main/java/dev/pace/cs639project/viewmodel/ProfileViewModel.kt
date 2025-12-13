@@ -8,9 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-// -------------------------
-// UI State
-// -------------------------
+
 data class ProfileUiState(
     val email: String = "",
     val sex: String? = null,
@@ -21,9 +19,6 @@ data class ProfileUiState(
     val saveSuccess: Boolean = false
 )
 
-// -------------------------
-// ViewModel
-// -------------------------
 class ProfileViewModel(
     private val userId: String,
     private val repo: FirestoreRepository = FirestoreRepository()
@@ -74,10 +69,6 @@ class ProfileViewModel(
         }
     }
 
-
-    // -------------------------
-    // SAVE PROFILE BACK TO FIRESTORE
-    // -------------------------
     fun saveProfile(email: String, sex: String?, height: Int?, weight: Int?) {
         viewModelScope.launch {
             try {

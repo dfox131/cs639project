@@ -28,24 +28,18 @@ fun GoalReviewScreen(
     )
     val uiState by viewModel.uiState.collectAsState()
 
-    // 🛠️ FIX 1: Define the state manager for the Snackbar
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope() // Required for launching the snackbar coroutine
+    val scope = rememberCoroutineScope()
 
-    // 🛠️ FIX 2: Observe the ViewModel statusMessage and show the Snackbar
     LaunchedEffect(uiState.statusMessage) {
         val message = uiState.statusMessage
         if (message != null) {
             scope.launch {
-                // Show the snackbar message
                 snackbarHostState.showSnackbar(
                     message = message,
-                    actionLabel = "DISMISS", // Optional dismiss button text
+                    actionLabel = "DISMISS",
                     duration = SnackbarDuration.Short
                 )
-                // Clear the message in the ViewModel immediately after showing
-                // (You'll need a clearStatusMessage() function in HabitGoalsViewModel)
-                // viewModel.clearStatusMessage()
             }
         }
     }
@@ -61,7 +55,6 @@ fun GoalReviewScreen(
                 }
             )
         },
-        // 🛠️ FIX 3: Pass the hostState to the SnackbarHost
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         }

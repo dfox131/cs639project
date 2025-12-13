@@ -37,7 +37,7 @@ sealed class AppScreen {
     object AddEditHabit : AppScreen()
 
     object Profile : AppScreen()
-    object GoalReview : AppScreen() // <-- NEW SCREEN
+    object GoalReview : AppScreen()
 }
 
 @Composable
@@ -48,7 +48,6 @@ fun AppNavigation(
     val authViewModel: AuthViewModel = viewModel()
     val currentUserId by authViewModel.currentUserId.collectAsState()
 
-    // Track whether we are on login or signup
     var showSignup by remember { mutableStateOf(false) }
 
     if (currentUserId == null) {
@@ -69,7 +68,6 @@ fun AppNavigation(
         }
     }
     else {
-        // 🚀 User LOGGED IN → show full app with drawer navigation
         MomentumApp(
             userId = currentUserId!!,
             isDarkTheme = isDarkTheme,
@@ -133,7 +131,6 @@ fun MomentumApp(
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
 
-                // <-- NEW DRAWER ITEM FOR GOAL REVIEW
                 NavigationDrawerItem(
                     label = { Text("Goal Review") },
                     selected = currentScreen is AppScreen.GoalReview,
@@ -184,7 +181,6 @@ fun MomentumApp(
             is AppScreen.Home -> HomeScreen(
                 userId = userId,
                 onOpenDrawer = { scope.launch { drawerState.open() } },
-                // FIX: Update the callback signature to pass userId
                 onOpenStreakTracker = { habitId ->
                     currentScreen = AppScreen.StreakTracker(habitId = habitId)
                 },
@@ -211,7 +207,6 @@ fun MomentumApp(
                 onHabitSaved = { currentScreen = AppScreen.Habits }
             )
 
-            // <-- NEW SCREEN ROUTE
             is AppScreen.GoalReview -> GoalReviewScreen(
                 userId = userId,
                 onBack = { currentScreen = AppScreen.Home }
