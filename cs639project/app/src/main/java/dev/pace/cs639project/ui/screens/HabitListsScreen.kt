@@ -1,6 +1,6 @@
 package dev.pace.cs639project.ui.screens
 
-import androidx.compose.foundation.clickable 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -33,9 +33,7 @@ fun HabitListScreen(
 
     val habits by viewModel.habits.collectAsState()
 
-    LaunchedEffect(userId) {
-        viewModel.loadHabits(userId)
-    }
+    val completedIds by viewModel.completedHabitIds.collectAsState()
 
     Scaffold(
         topBar = {
@@ -73,11 +71,15 @@ fun HabitListScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(habits) { habit ->
-                        // 2. PASSED: Pass the habit object and the new navigation callback
+
+
+                        val isCompleted = completedIds.contains(habit.habitId)
+
                         HabitCard(
                             habit = habit,
                             userId = userId,
                             firestoreVm = viewModel,
+                            isCompleted = isCompleted, // Pass the status down
                             onCardClick = { onOpenStreakTracker(habit.habitId) }
                         )
 
@@ -93,21 +95,31 @@ fun HabitCard(
     habit: Habit,
     userId: String,
     firestoreVm: FirestoreViewModel,
+    isCompleted: Boolean,
     onCardClick: (habitId: String) -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            // 4. ADDED: Make the whole card clickable and pass the habitId
             .clickable { onCardClick(habit.habitId) },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
-            Text(
-                text = habit.name,
-                style = MaterialTheme.typography.titleMedium
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = habit.name,
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                //Show a checkmark if done
+                if (isCompleted) {
+                    Text("✅", style = MaterialTheme.typography.titleMedium)
+                }
+            }
 
             Text(
                 text = "Type: ${habit.type}",
@@ -128,6 +140,8 @@ fun HabitCard(
                 )
             }
 
+            Spacer(modifier = Modifier.height(12.dp))
+
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -143,23 +157,35 @@ fun HabitCard(
                     Text(text = "View Streak")
                 }
 
-                // MARK COMPLETED BUTTON (GREEN)
-                Button(
-                    onClick = {
-                        firestoreVm.markHabitCompleted(
-                            userId = userId,
-                            habitId = habit.habitId
+                // MARK COMPLETED BUTTON
+                if (isCompleted) {
+                    Button(
+                        onClick = { /* Do nothing, already done */ },
+                        enabled = false, // Disable the button
+                        colors = ButtonDefaults.buttonColors(
+                            disabledContainerColor = Color.LightGray,
+                            disabledContentColor = Color.White
                         )
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF4CAF50),
-                        contentColor = Color.White
-                    )
-                ) {
-                    Text(text = "Mark Completed")
+                    ) {
+                        Text(text = "Done")
+                    }
+                } else {
+                    Button(
+                        onClick = {
+                            firestoreVm.markHabitCompleted(
+                                userId = userId,
+                                habitId = habit.habitId
+                            )
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF4CAF50),
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text(text = "Mark Completed")
+                    }
                 }
             }
-
         }
     }
 }

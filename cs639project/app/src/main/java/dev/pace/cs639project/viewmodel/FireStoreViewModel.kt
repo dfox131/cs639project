@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -34,23 +35,14 @@ class FirestoreViewModel(
 
     fun initAuth() {
         viewModelScope.launch {
-            println("AUTH STARTED")
-
             val current = authRepo.getCurrentUserId()
 
             if (current != null) {
                 _userId.value = current
             } else {
                 val result = authRepo.signInAnonymously()
-
-                result.onSuccess { uid ->
-                    println("AUTH SUCCESS: $uid")
-                    _userId.value = uid
-                }
-
-                result.onFailure {
-                    it.printStackTrace()
-                }
+                result.onSuccess { uid -> _userId.value = uid }
+                result.onFailure { it.printStackTrace() }
             }
         }
     }
@@ -61,14 +53,27 @@ class FirestoreViewModel(
     private val _habits = MutableStateFlow<List<Habit>>(emptyList())
     val habits = _habits.asStateFlow()
 
+
+    private val _completedHabitIds = MutableStateFlow<Set<String>>(emptySet())
+    val completedHabitIds = _completedHabitIds.asStateFlow()
+
     // ----------------------------
-    // LOAD HABITS
+    // LOAD HABITS & PROGRESS
     // ----------------------------
     fun loadHabits(userId: String) {
         viewModelScope.launch {
+            //  Load Habits List
             val result = repo.getUserHabits(userId)
             result.onSuccess { habitsList ->
                 _habits.value = habitsList
+            }
+
+            // Load Today's Progress to update checkboxes/buttons
+            val today = LocalDate.now().toString()
+            val progressResult = repo.getTodayProgress(userId, today)
+            progressResult.onSuccess { list ->
+                val ids = list.mapNotNull { it["habitId"] as? String }.toSet()
+                _completedHabitIds.value = ids
             }
         }
     }
@@ -108,8 +113,12 @@ class FirestoreViewModel(
 
             result.onSuccess {
                 _habitCompleted.emit(habitId)
+
+
+                _completedHabitIds.update { currentSet ->
+                    currentSet + habitId
+                }
             }
         }
     }
-
 }
