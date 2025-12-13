@@ -80,18 +80,30 @@ You can view the full UI/UX design and Database schema of this app:
   </tr>
 </table>
 
-## Screenshots
+## 📸 Screenshots
 
 <table>
   <tr>
-    <td valign="top"><img src="" width="220" alt="Home Screen" /></td>
-    <td valign="top"><img src="" width="220" alt="Habits List" /></td>
-    <td valign="top"><img src="" width="220" alt="Streak Tracker" /></td>
+    <td valign="top">
+      <img src="screenshots/home.png" width="220" alt="Home Screen" />
+    </td>
+    <td valign="top">
+      <img src="screenshots/habits.png" width="220" alt="Habits List" />
+    </td>
+    <td valign="top">
+      <img src="screenshots/streak.png" width="220" alt="Streak Tracker" />
+    </td>
   </tr>
   <tr>
-    <td valign="top"><img src="" width="220" alt="Add Habit" /></td>
-    <td valign="top"><img src="" width="220" alt="API Suggestions" /></td>
-    <td valign="top"><img src="" width="220" alt="Settings" /></td>
+    <td valign="top">
+      <img src="screenshots/add_habit.png" width="220" alt="Add Habit" />
+    </td>
+    <td valign="top">
+      <img src="screenshots/habit_suggestions.png" width="220" alt="Habit Suggestions" />
+    </td>
+    <td valign="top">
+      <img src="screenshots/settings.png" width="220" alt="Settings" />
+    </td>
   </tr>
 </table>
 
