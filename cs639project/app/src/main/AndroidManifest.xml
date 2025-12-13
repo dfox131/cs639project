@@ -2,8 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.health.READ_STEPS"/>
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -21,34 +19,9 @@
             android:theme="@style/Theme.Cs639project">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity-alias
-            android:name="HealthPermissionRequestProvider"
-            android:exported="true"
-            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
-            android:targetActivity=".MainActivity">
-            <intent-filter>
-                <action android:name="androidx.health.ACTION_REQUEST_PERMISSIONS" />
-            </intent-filter>
-        </activity-alias>
-
-        <activity-alias
-            android:name="HealthPermissionUsageProvider"
-            android:exported="true"
-            android:targetActivity=".MainActivity">
-            <intent-filter>
-                <action android:name="android.content.Intent#ACTION_VIEW_PERMISSION_USAGE" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.health.connect.HealthConnectManager#CATEGORY_HEALTH_PERMISSIONS" />
-            </intent-filter>
-        </activity-alias>
-
     </application>
-    <queries>
-        <package android:name="com.google.android.apps.healthdata" />
-    </queries>
 </manifest>

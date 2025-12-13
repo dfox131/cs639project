@@ -112,20 +112,21 @@ class StreakTrackerViewModel(
     }
 
     fun reload() {
+        // Ensures that the UI correctly reacts to the completion event by re-fetching data.
         loadHabitAndProgress()
     }
 
     /**
      * Calculates the longest consecutive streak ending yesterday or today.
+     * * FIX: Simplified logic for robust checking.
      */
     private fun calculateCurrentStreak(completedDates: Set<LocalDate>): Int {
         var streak = 0
         var checkDate = LocalDate.now()
 
-        if (completedDates.contains(checkDate)) {
-            streak = 1
-            checkDate = checkDate.minusDays(1)
-        } else {
+        // If today is completed, start checking from today.
+        // If today is NOT completed, start checking from yesterday.
+        if (!completedDates.contains(checkDate)) {
             checkDate = checkDate.minusDays(1)
         }
 
@@ -143,10 +144,11 @@ class StreakTrackerViewModel(
     private fun calculateWeeklyCompletion(completedDates: Set<LocalDate>): Set<DayOfWeek> {
         val completedDays = mutableSetOf<DayOfWeek>()
         val today = LocalDate.now()
-        val lastWeek = today.minusDays(7)
+        val lastWeekStart = today.minusDays(6) // Check 7 days total (today and previous 6)
 
         completedDates.forEach { date ->
-            if (date.isAfter(lastWeek) && !date.isAfter(today)) {
+            // Check if the date is within the last 7 days, including today
+            if (!date.isBefore(lastWeekStart) && !date.isAfter(today)) {
                 completedDays.add(date.dayOfWeek)
             }
         }
@@ -166,3 +168,4 @@ class StreakTrackerViewModel(
             }
     }
 }
+// Note: The FirestoreRepository code remains unchanged as it is structurally sound.
