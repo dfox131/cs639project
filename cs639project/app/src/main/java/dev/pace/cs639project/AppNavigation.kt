@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star // New icon for Goal Review
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -17,6 +18,7 @@ import dev.pace.cs639project.ui.screens.HabitListScreen
 import dev.pace.cs639project.ui.screens.HomeScreen
 import dev.pace.cs639project.ui.screens.SettingsScreen
 import dev.pace.cs639project.ui.screens.StreakTrackerScreen
+import dev.pace.cs639project.ui.screens.GoalReviewScreen // <-- NEW IMPORT
 import kotlinx.coroutines.launch
 import dev.pace.cs639project.viewmodel.AuthViewModel
 import dev.pace.cs639project.ui.screens.LoginScreen
@@ -35,6 +37,7 @@ sealed class AppScreen {
     object AddEditHabit : AppScreen()
 
     object Profile : AppScreen()
+    object GoalReview : AppScreen() // <-- NEW SCREEN
 }
 
 @Composable
@@ -108,8 +111,6 @@ fun MomentumApp(
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
 
-                // Users will access it via Home or "My Habits" list.
-
                 NavigationDrawerItem(
                     label = { Text("My Habits") },
                     selected = currentScreen is AppScreen.Habits,
@@ -129,6 +130,18 @@ fun MomentumApp(
                         scope.launch { drawerState.close() }
                     },
                     icon = { Icon(Icons.Default.Add, contentDescription = null) },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+
+                // <-- NEW DRAWER ITEM FOR GOAL REVIEW
+                NavigationDrawerItem(
+                    label = { Text("Goal Review") },
+                    selected = currentScreen is AppScreen.GoalReview,
+                    onClick = {
+                        currentScreen = AppScreen.GoalReview
+                        scope.launch { drawerState.close() }
+                    },
+                    icon = { Icon(Icons.Default.Star, contentDescription = null) },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
 
@@ -171,6 +184,7 @@ fun MomentumApp(
             is AppScreen.Home -> HomeScreen(
                 userId = userId,
                 onOpenDrawer = { scope.launch { drawerState.open() } },
+                // FIX: Update the callback signature to pass userId
                 onOpenStreakTracker = { habitId ->
                     currentScreen = AppScreen.StreakTracker(habitId = habitId)
                 },
@@ -178,7 +192,6 @@ fun MomentumApp(
                 onOpenSettings = { currentScreen = AppScreen.Settings }
             )
 
-            // This screen is still reachable via code, just not from the drawer.
             is AppScreen.StreakTracker -> StreakTrackerScreen(
                 habitId = (currentScreen as AppScreen.StreakTracker).habitId!!,
                 userId = userId,
@@ -196,6 +209,12 @@ fun MomentumApp(
                 userId = userId,
                 onBack = { currentScreen = AppScreen.Home },
                 onHabitSaved = { currentScreen = AppScreen.Habits }
+            )
+
+            // <-- NEW SCREEN ROUTE
+            is AppScreen.GoalReview -> GoalReviewScreen(
+                userId = userId,
+                onBack = { currentScreen = AppScreen.Home }
             )
 
             is AppScreen.ApiSuggestions -> ApiSuggestionsScreen(

@@ -119,8 +119,56 @@ class FirestoreRepository {
         }
     }
 
+    suspend fun getHabitValueHistory(
+        userId: String,
+        habitId: String,
+        startDate: String // YYYY-MM-DD format
+    ): Result<List<Int>> {
+        return try {
+            val snapshot = db.collection("progress")
+                .whereEqualTo("userId", userId) // Filter 1
+                .whereEqualTo("habitId", habitId) // Filter 2
+                .whereGreaterThanOrEqualTo("date", startDate) // Range Filter 3
+                .get()
+                .await()
 
+            val values = snapshot.documents.mapNotNull { doc ->
+                // Ensure the 'value' field exists and is a number
+                (doc.data?.get("value") as? Number)?.toInt()
+            }
 
+            Result.success(values)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Updates only the goal for a specific habit.
+     */
+    suspend fun updateHabitGoal(
+        userId: String,
+        habitId: String,
+        newGoal: Int
+    ): Result<Unit> {
+        return try {
+            val updates = hashMapOf(
+                "goal" to newGoal,
+                "updatedAt" to Timestamp.now()
+            )
+
+            db.collection("users")
+                .document(userId)
+                .collection("habits")
+                .document(habitId)
+                .set(updates as Map<String, Any>, SetOptions.merge())
+                .await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
     // --------------------------
     // PROGRESS (Daily completion)
     // --------------------------
