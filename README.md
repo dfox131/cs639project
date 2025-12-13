@@ -114,7 +114,7 @@ You can view the full UI/UX design and Database schema of this app:
 
 ## GitHub Insights
 
-[View GitHub Insights](https://github.com/dfox131/cs639project/insights)
+[View GitHub Insights](https://github.com/dfox131/cs639project/pulse)
 
 ## Learning Experience & Challenges
 - **State Management**: Strengthened understanding of **ViewModel** and **StateFlow** to manage UI state effectively across multiple screens.
