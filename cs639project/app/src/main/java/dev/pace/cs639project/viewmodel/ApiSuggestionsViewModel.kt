@@ -2,22 +2,27 @@ package dev.pace.cs639project.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dev.pace.cs639project.ui.components.ExerciseSuggestion
-import dev.pace.cs639project.ui.components.fakeSuggestions
-import kotlinx.coroutines.delay
+import dev.pace.cs639project.data.FirestoreRepository
+import dev.pace.cs639project.ui.components.ExerciseSuggestion // Assumed import
+import dev.pace.cs639project.ui.components.exerciseSuggestions // Use the list of real data
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import android.util.Log // Use Android logging
 
+// --- UI State for API Screen ---
 data class ApiSuggestionsUiState(
     val suggestions: List<ExerciseSuggestion> = emptyList(),
-    val isLoading: Boolean = true,
+    val isLoading: Boolean = false,
     val error: String? = null
 )
 
-class ApiSuggestionsViewModel : ViewModel() {
+// --- ViewModel ---
+class ApiSuggestionsViewModel(
+    private val firestoreRepository: FirestoreRepository = FirestoreRepository()
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ApiSuggestionsUiState())
     val uiState: StateFlow<ApiSuggestionsUiState> = _uiState.asStateFlow()
@@ -27,29 +32,41 @@ class ApiSuggestionsViewModel : ViewModel() {
     }
 
     private fun fetchSuggestions() {
+        // In a real app, this would call an API repository (e.g., using Retrofit).
+        // For now, use the local list of real exercises.
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            _uiState.update { it.copy(isLoading = true) }
+            // Simulate network delay
+            kotlinx.coroutines.delay(500)
 
-            try {
-                // Simulate network latency (e.g., fetching from an external API)
-                delay(1500)
+            _uiState.update {
+                it.copy(
+                    suggestions = exerciseSuggestions, // Use the real data list
+                    isLoading = false
+                )
+            }
+        }
+    }
 
-                // NOTE: In a real app, this would be a repository call (e.g., repo.getSuggestions())
-                val realSuggestions = fakeSuggestions // Using fake data for now
+    /**
+     * 🔥 FIX: Saves the selected exercise suggestion as a new habit in Firestore.
+     */
+    fun addHabitFromSuggestion(userId: String, suggestion: ExerciseSuggestion) {
+        viewModelScope.launch {
+            // Default parameters for exercise habits
+            val result = firestoreRepository.createHabit(
+                userId = userId,
+                name = suggestion.name,
+                type = "exercise",
+                goal = 1, // Default goal: 1 completion per day
+                reminderTime = null
+            )
 
-                _uiState.update {
-                    it.copy(
-                        suggestions = realSuggestions,
-                        isLoading = false
-                    )
-                }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = "Failed to load suggestions: ${e.message}"
-                    )
-                }
+            result.onSuccess { habitId ->
+                Log.d("ApiVM", "Habit created with ID: $habitId")
+            }.onFailure { e ->
+                Log.e("ApiVM", "Failed to create habit: ${e.message}")
+                _uiState.update { it.copy(error = "Failed to save habit: ${e.message}") }
             }
         }
     }

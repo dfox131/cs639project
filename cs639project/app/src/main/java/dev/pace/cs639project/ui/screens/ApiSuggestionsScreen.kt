@@ -10,7 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material3.*
+import androidx.compose.material3.* // Import all Material3 components
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,18 +23,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import dev.pace.cs639project.ui.components.ExerciseSuggestion
-import dev.pace.cs639project.viewmodel.ApiSuggestionsViewModel // <-- NEW IMPORT
+import dev.pace.cs639project.ui.components.ExerciseSuggestion // Assumed import
+import dev.pace.cs639project.viewmodel.ApiSuggestionsViewModel
+import dev.pace.cs639project.viewmodel.AuthViewModel
+import androidx.compose.material3.ExperimentalMaterial3Api // 🛠️ FIX 3: Required import
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ApiSuggestionsScreen(
     onBack: () -> Unit = {},
     onNotificationClick: () -> Unit = {},
-    viewModel: ApiSuggestionsViewModel = viewModel() // <-- Initialize ViewModel
+    viewModel: ApiSuggestionsViewModel = viewModel(),
+    authViewModel: AuthViewModel = viewModel() // Use existing AuthViewModel
 ) {
     val context = LocalContext.current
-    val uiState by viewModel.uiState.collectAsState() // <-- Collect UI State
+    val uiState by viewModel.uiState.collectAsState()
+    val currentUserId by authViewModel.currentUserId.collectAsState() // Get the current user ID
+
+    // ❌ REMOVED: Illegal Firestore initialization code here.
 
     Scaffold(
         topBar = {
@@ -79,17 +85,32 @@ fun ApiSuggestionsScreen(
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(vertical = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp) 
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         items(uiState.suggestions) { item ->
                             ExerciseSuggestionCard(
                                 suggestion = item,
                                 onTryClick = {
-                                    Toast.makeText(
-                                        context,
-                                        "You chose: ${item.name}",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    val userId = currentUserId
+                                    if (userId != null) {
+                                        // Call ViewModel to add habit
+                                        viewModel.addHabitFromSuggestion(
+                                            userId = userId,
+                                            suggestion = item
+                                        )
+                                        Toast.makeText(
+                                            context,
+                                            "Habit added: ${item.name}",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        onBack() // Navigate back after success
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            "Error: User not logged in.",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
                                 }
                             )
                         }
@@ -99,6 +120,10 @@ fun ApiSuggestionsScreen(
         }
     }
 }
+
+// ----------------------------------------------------------------------
+// ExerciseSuggestionCard Component Definition (Kept for completeness)
+// ----------------------------------------------------------------------
 
 @Composable
 fun ExerciseSuggestionCard(
@@ -114,7 +139,6 @@ fun ExerciseSuggestionCard(
             .fillMaxWidth()
             .height(150.dp)
     ) {
-        // separate content and button
         Box(
             modifier = Modifier
                 .fillMaxSize()
