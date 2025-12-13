@@ -152,7 +152,7 @@ fun HomeScreen(
                         item {
                             Spacer(Modifier.height(16.dp))
                             Button(onClick = onOpenApi, modifier = Modifier.fillMaxWidth()) {
-                                Text("Explore New Habit Ideas (API)")
+                                Text("Explore New Habit Ideas")
                             }
                         }
                     }

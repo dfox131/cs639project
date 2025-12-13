@@ -45,7 +45,7 @@ fun ApiSuggestionsScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(text = "API Suggestions") },
+                title = { Text(text = "Habit Suggestions") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")

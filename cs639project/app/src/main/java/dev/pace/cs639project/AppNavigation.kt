@@ -146,7 +146,7 @@ fun MomentumApp(
                 )
 
                 NavigationDrawerItem(
-                    label = { Text("API Suggestions") },
+                    label = { Text("Habit Suggestions") },
                     selected = currentScreen is AppScreen.ApiSuggestions,
                     onClick = {
                         currentScreen = AppScreen.ApiSuggestions
